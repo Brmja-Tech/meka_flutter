@@ -1,0 +1,9 @@
+{
+  "login": "Login",
+  "email": "Email",
+  "password": "Password" ,
+  "register": "Register",
+  "name": "Name",
+  "phone": "Phone",
+  "forgot": "Forgot Password"
+}
