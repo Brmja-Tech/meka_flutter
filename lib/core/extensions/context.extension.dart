@@ -13,10 +13,10 @@ extension ContextExtensions on BuildContext {
   TextDirection get textDirection =>
       isArabic ? TextDirection.rtl : TextDirection.ltr;
   FocusScopeNode get foucsScopeNode => FocusScope.of(this);
-  goWithNoReturn(Widget widget, String routeName) =>
-      navToAndRemoveUntil(this, widget, routeName);
+  goWithNoReturn(Widget widget, {String? routeName}) =>
+      navToAndRemoveUntil(this, widget, routeName: routeName);
 
-  go(Widget widget, String routeName) => navTo(this, widget, routeName);
+  go(Widget widget, {String? routeName}) => navTo(this, widget, routeName);
 
   pop([Object? object]) => Navigator.of(this).pop(object);
 

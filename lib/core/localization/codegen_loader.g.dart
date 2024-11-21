@@ -20,7 +20,24 @@ class CodegenLoader extends AssetLoader{
   "password": "كلمة المرور",
   "remember": "تذكرني",
   "forgot": "نسيت كلمة المرور؟",
-  "register": "إنشاء حساب"
+  "register": "إنشاء حساب",
+  "dontHaveAccount": "ليس لديك حساب؟",
+  "clickHere": "انقر هنا",
+  "alreadyHaveAccount": "لديك حساب بالفعل؟",
+  "signUp": "تسجيل",
+  "continueWith": "أو الاستمرار مع",
+  "registerNow": "سجل الآن",
+  "name": "الاسم",
+  "phone": "الهاتف",
+  "signInNow": "قم بتسجيل الدخول",
+  "createYourAccount": "إنشاء حسابك",
+  "enterYourEmailPlease": "ادخل البريد الالكتروني",
+  "resendOTP": "اعاده الارسال",
+  "resetPassword": "تغيير كلمه السر",
+  "sendOTP": "ارسال الرمز",
+  "enterCode": "ادخل الرمز",
+  "confirmPassword": "تأكيد كلمة المرور",
+  "newPassword": "كلمه المرور الجديدة"
 };
 static const Map<String,dynamic> en = {
   "login": "Login",
@@ -28,8 +45,24 @@ static const Map<String,dynamic> en = {
   "password": "Password",
   "remember": "Remember Me",
   "forgot": "Forgot Password?",
-  "register": "Create Account"
+  "register": "Create Account",
+  "dontHaveAccount": "Don\\'t have an account?",
+  "alreadyHaveAccount": "Already have an account?",
+  "signUp": "Sign Up",
+  "clickHere": "Click here",
+  "continueWith": "Continue with",
+  "registerNow": "Register Now",
+  "name": "Name",
+  "phone": "Phone",
+  "createYourAccount": "Create your account",
+  "signInNow": "Sign in now",
+  "enterCode": "Enter Code",
+  "enterYourEmailPlease": "Enter your Email please",
+  "resendOTP": "Resend OTP",
+  "sendOTP": "Send OTP",
+  "resetPassword": "Reset Password",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm Password"
 };
-
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": ar, "en": en};
 }

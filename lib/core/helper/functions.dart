@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
-navTo(BuildContext context, Widget widget, String routeName) =>
+navTo(BuildContext context, Widget widget, String? routeName) =>
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => widget,
         settings: RouteSettings(
           name: routeName,
         )));
 
-navToAndRemoveUntil(BuildContext context, Widget widget, String routeName) =>
+navToAndRemoveUntil(BuildContext context, Widget widget, {String? routeName}) =>
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
           builder: (context) => widget,

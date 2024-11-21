@@ -4,5 +4,22 @@
   "password": "كلمة المرور",
   "remember": "تذكرني",
   "forgot": "نسيت كلمة المرور؟",
-  "register": "إنشاء حساب"
+  "register": "إنشاء حساب",
+  "dontHaveAccount": "ليس لديك حساب؟",
+  "clickHere": "انقر هنا",
+  "alreadyHaveAccount": "لديك حساب بالفعل؟",
+  "signUp": "تسجيل",
+  "continueWith": "أو الاستمرار مع",
+  "registerNow": "سجل الآن",
+  "name": "الاسم",
+  "phone": "الهاتف",
+  "signInNow": "قم بتسجيل الدخول",
+  "createYourAccount": "إنشاء حسابك",
+  "enterYourEmailPlease": "ادخل البريد الالكتروني",
+  "resendOTP": "اعاده الارسال",
+  "resetPassword": "تغيير كلمه السر",
+  "sendOTP": "ارسال الرمز",
+  "enterCode": "ادخل الرمز",
+  "confirmPassword": "تأكيد كلمة المرور",
+  "newPassword": "كلمه المرور الجديدة"
 }

@@ -4,6 +4,23 @@
   "password": "Password",
   "remember": "Remember Me",
   "forgot": "Forgot Password?",
-  "register": "Create Account"
+  "register": "Create Account",
+  "dontHaveAccount": "Don\\'t have an account?",
+  "alreadyHaveAccount": "Already have an account?",
+  "signUp": "Sign Up",
+  "clickHere": "Click here",
+  "continueWith": "Continue with",
+  "registerNow": "Register Now",
+  "name": "Name",
+  "phone": "Phone",
+  "createYourAccount": "Create your account",
+  "signInNow": "Sign in now",
+  "enterCode": "Enter Code",
+  "enterYourEmailPlease": "Enter your Email please",
+  "resendOTP": "Resend OTP",
+  "sendOTP": "Send OTP",
+  "resetPassword": "Reset Password",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm Password"
 }
 

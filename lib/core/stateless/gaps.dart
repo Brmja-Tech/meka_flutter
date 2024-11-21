@@ -22,6 +22,9 @@ class Gaps extends StatelessWidget {
   factory Gaps.v28() => Gaps(width: 0, height: 28.h);
 
   factory Gaps.h28() => Gaps(width: 28.w, height: 0);
+  factory Gaps.v48() => Gaps(width: 0, height: 48.h);
+
+  factory Gaps.h48() => Gaps(width: 48.w, height: 0);
 
   @override
   Widget build(BuildContext context) {
