@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meka/core/extensions/context.extension.dart';
@@ -11,6 +12,8 @@ import 'package:meka/core/stateful/custom_text_field.dart';
 import 'package:meka/core/stateless/custom_appbar.dart';
 import 'package:meka/core/stateless/custom_button.dart';
 import 'package:meka/core/stateless/gaps.dart';
+import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
+import 'package:meka/service_locator/service_locator.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -115,7 +118,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       : TextAlign.center,
                   textInputType: TextInputType.visiblePassword,
                 ),
-        
+
                 Gaps.vertical(context.screenHeight * 0.009),
                 CustomElevatedButton(
                   text: LocaleKeys.register.tr(),
@@ -131,7 +134,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 RichText(
                   text: TextSpan(
                     text: LocaleKeys.alreadyHaveAccount.tr(), // The main text
-                    style: context.theme.textTheme.labelLarge!.copyWith(color:Colors.grey),
+                    style: context.theme.textTheme.labelLarge!.copyWith(
+                        color: Colors.grey),
                     children: [
                       TextSpan(
                         text: '\t${LocaleKeys.signInNow.tr()}',
@@ -168,7 +172,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Gaps.h48()
                       ],
                       InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            context.read<AuthBloc>().googleSignIn(0, 'admin');
+                          },
                           child: SvgPicture.asset(
                             'assets/svg/google.svg',
                             width: 60.w,

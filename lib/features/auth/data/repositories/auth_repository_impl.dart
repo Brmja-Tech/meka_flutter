@@ -25,4 +25,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, void>> register(RegisterParams params) {
     return _authDataSource.register(params);
   }
+
+  @override
+  Future<Either<Failure, void>> googleSignIn(LoginParams params) {
+    return _authDataSource.googleLogin(params);
+  }
 }

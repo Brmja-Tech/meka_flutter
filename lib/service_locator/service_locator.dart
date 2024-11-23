@@ -40,6 +40,8 @@ class DI {
             )
         ]),
     );
-    sl.registerLazySingleton(() => AuthServiceLocator());
+
+    await  AuthServiceLocator.execute(sl: sl);
+
   }
 }

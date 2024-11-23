@@ -3,7 +3,9 @@ abstract class Failure {
 
   Failure(this.message);
 }
-
+class AuthFailure extends Failure {
+  AuthFailure({required String message}) : super(message);
+}
 class ValidationFailure extends Failure {
   final List<String> errors;
 
