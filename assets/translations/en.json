@@ -21,6 +21,8 @@
   "sendOTP": "Send OTP",
   "resetPassword": "Reset Password",
   "newPassword": "New Password",
+  "rider": "Rider",
+  "driver": "Driver",
   "confirmPassword": "Confirm Password"
 }
 

@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meka/core/network/base_use_case/base_use_case.dart';
 import 'package:meka/features/auth/data/datasources/auth_data_source.dart';
+import 'package:meka/features/auth/domain/usecases/facebook_sign_in_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/google_sign_in_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/login_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/logout_use_case.dart';
@@ -12,9 +13,10 @@ class AuthBloc extends Cubit<AuthState> {
   final LogoutUseCase _logoutUseCase;
   final RegisterUseCase _registerUseCase;
   final GoogleSignInUseCase _googleSignInUseCase;
+  final FacebookSignInUseCase _facebookSignInUseCase;
 
   AuthBloc(this._logoutUseCase, this._loginUseCase, this._registerUseCase,
-      this._googleSignInUseCase)
+      this._facebookSignInUseCase, this._googleSignInUseCase)
       : super(const AuthState());
 
   Future<void> login(
@@ -54,6 +56,16 @@ class AuthBloc extends Cubit<AuthState> {
     emit(state.copyWith(status: AuthStatus.loading));
     final result =
         await _googleSignInUseCase(LoginParams(role: role, type: type));
+    result.fold(
+      (l) => emit(
+          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+      (r) => emit(state.copyWith(status: AuthStatus.success)),
+    );
+  }
+  Future<void> facebookSignIn(int role, String type) async {
+    emit(state.copyWith(status: AuthStatus.loading));
+    final result =
+        await _facebookSignInUseCase(LoginParams(role: role, type: type));
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),

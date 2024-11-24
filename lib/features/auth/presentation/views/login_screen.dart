@@ -131,7 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       )),
                   Gaps.h48(),
                   InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        context.read<AuthBloc>().facebookSignIn(0, 'user');
+                      },
                       child: SvgPicture.asset(
                         'assets/svg/facebook.svg',
                         width: 60.w,

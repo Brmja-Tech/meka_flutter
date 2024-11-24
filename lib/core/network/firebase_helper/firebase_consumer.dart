@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:meka/core/network/failure/failure.dart';
 import 'package:meka/core/network/http/either.dart';
@@ -12,8 +15,8 @@ abstract final class FirebaseApiConsumer {
 }
 
 final class BaseFirebaseApiConsumer implements FirebaseApiConsumer {
-
   BaseFirebaseApiConsumer();
+
   @override
   Future<Either<Failure, User>> loginWithApple() {
     // TODO: implement loginWithApple
@@ -21,9 +24,24 @@ final class BaseFirebaseApiConsumer implements FirebaseApiConsumer {
   }
 
   @override
-  Future<Either<Failure, User>> loginWithFacebook() {
-    // TODO: implement loginWithFacebook
-    throw UnimplementedError();
+  Future<Either<Failure, User>> loginWithFacebook() async {
+
+    log('llllllllllllllllllllllllllllllllllllllllllllll');
+    // Trigger the sign-in flow
+    final LoginResult loginResult = await FacebookAuth.instance.login();
+
+    // Create a credential from the access token
+    final OAuthCredential facebookAuthCredential =
+        FacebookAuthProvider.credential(loginResult.accessToken!.tokenString);
+    final UserCredential userCredential = await FirebaseAuth.instance
+        .signInWithCredential(facebookAuthCredential);
+    log('token is ${loginResult.accessToken!.tokenString}');
+    log('message is ${loginResult.accessToken!.tokenString}');
+    if (userCredential.user == null) {
+      return Left(AuthFailure(message: 'Failed to sign in with Facebook'));
+    } else {
+      return Right(userCredential.user!);
+    }
   }
 
   @override

@@ -23,6 +23,8 @@ abstract class  LocaleKeys {
   static const sendOTP = 'sendOTP';
   static const enterCode = 'enterCode';
   static const confirmPassword = 'confirmPassword';
+  static const rider = 'rider';
+  static const driver = 'driver';
   static const newPassword = 'newPassword';
 
 }

@@ -2,6 +2,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CacheManager {
   static const _accessTokenKey = 'accessToken';
+  static const _roleKey = 'role';
+  // Save access token
+  static Future<void> saveRole(bool role) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_roleKey, role);
+  }
+
+  static Future<bool?> getRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_roleKey);
+  }
 
   // Save access token
   static Future<void> saveAccessToken(String token) async {

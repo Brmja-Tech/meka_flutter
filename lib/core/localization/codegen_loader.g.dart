@@ -37,6 +37,8 @@ class CodegenLoader extends AssetLoader{
   "sendOTP": "ارسال الرمز",
   "enterCode": "ادخل الرمز",
   "confirmPassword": "تأكيد كلمة المرور",
+  "rider": "سائق",
+  "driver": "عميل",
   "newPassword": "كلمه المرور الجديدة"
 };
 static const Map<String,dynamic> en = {
@@ -62,6 +64,8 @@ static const Map<String,dynamic> en = {
   "sendOTP": "Send OTP",
   "resetPassword": "Reset Password",
   "newPassword": "New Password",
+  "rider": "Rider",
+  "driver": "Driver",
   "confirmPassword": "Confirm Password"
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": ar, "en": en};

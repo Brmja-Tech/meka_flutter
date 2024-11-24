@@ -21,5 +21,7 @@
   "sendOTP": "ارسال الرمز",
   "enterCode": "ادخل الرمز",
   "confirmPassword": "تأكيد كلمة المرور",
+  "rider": "سائق",
+  "driver": "عميل",
   "newPassword": "كلمه المرور الجديدة"
 }

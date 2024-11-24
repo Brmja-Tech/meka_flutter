@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:equatable/equatable.dart';
 import 'package:meka/core/network/base_use_case/base_use_case.dart';
 import 'package:meka/core/network/cache_helper/cache_manager.dart';
@@ -66,9 +68,13 @@ class AuthDataSourceImpl implements AuthDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> facebookLogin(LoginParams params) {
-    // TODO: implement facebookLogin
-    throw UnimplementedError();
+  Future<Either<Failure, void>> facebookLogin(LoginParams params) async {
+    final result = await _firebaseApiConsumer.loginWithFacebook();
+    return result.fold((l) => Left(l), (r) {
+      log('token is ${r.uid}');
+      // login(LoginParams(email: r.email!, role: params.role, type: params.type));
+      return Right(null);
+    });
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -8,12 +9,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/localization/locale_keys.g.dart';
+import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/stateful/custom_text_field.dart';
 import 'package:meka/core/stateless/custom_appbar.dart';
 import 'package:meka/core/stateless/custom_button.dart';
 import 'package:meka/core/stateless/gaps.dart';
+import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
-import 'package:meka/service_locator/service_locator.dart';
+import 'package:meka/meka/meka_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -29,6 +32,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
+  List<bool> isSelected = [true, false]; // Initial state: "Driver" selected
+  bool isDriver = true; // Default value
 
   @override
   void dispose() {
@@ -118,7 +123,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       : TextAlign.center,
                   textInputType: TextInputType.visiblePassword,
                 ),
-
+                ToggleButtons(
+                  borderColor: Colors.grey,
+                  fillColor: AppColors.primaryColor,
+                  borderWidth: 2,
+                  selectedBorderColor: AppColors.primaryColor,
+                  selectedColor: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  isSelected: isSelected,
+                  onPressed: (int index) {
+                    setState(() {
+                      for (int i = 0; i < isSelected.length; i++) {
+                        isSelected[i] = i == index; // Toggle selection
+                      }
+                      isDriver = index == 0; // If first button is selected, it's "Driver"
+                      log(isSelected.toString());
+                    });
+                  },
+                  children: [
+                    Padding(
+                      padding:  const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Text(LocaleKeys.driver.tr(), style: const TextStyle(fontSize: 16)),
+                    ),
+                    Padding(
+                      padding:  const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Text(LocaleKeys.rider.tr(), style: const TextStyle(fontSize: 16)),
+                    ),
+                  ],
+                ),
                 Gaps.vertical(context.screenHeight * 0.009),
                 CustomElevatedButton(
                   text: LocaleKeys.register.tr(),
@@ -128,7 +160,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   textStyle: context.theme.textTheme.bodyLarge!
                       .copyWith(color: Colors.white),
                   // color: AppCol,
-                  onPressed: () {},
+                  onPressed: () async {
+                    await CacheManager.saveRole(isDriver);
+                    if(context.mounted)context.go(const MekaScreen());
+                  },
                 ),
                 Gaps.vertical(context.screenHeight * 0.01),
                 RichText(

@@ -8,4 +8,5 @@ abstract class AuthRepository {
   Future<Either<Failure, void>> register(RegisterParams params);
   Future<Either<Failure, void>> logout(NoParams noParams);
   Future<Either<Failure, void>> googleSignIn(LoginParams params);
+  Future<Either<Failure, void>> facebookSignIn(LoginParams params);
 }
