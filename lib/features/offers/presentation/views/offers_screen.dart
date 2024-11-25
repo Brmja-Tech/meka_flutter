@@ -6,8 +6,8 @@ import 'package:meka/core/stateful/carousel_slider_widget.dart';
 import 'package:meka/core/stateful/custom_text_field.dart';
 import 'package:meka/core/stateful/grid_wrap.dart';
 import 'package:meka/core/stateless/gaps.dart';
+import 'package:meka/core/stateless/image_from_internet.dart';
 import 'package:meka/core/theme/app_colors.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class OfferScreen extends StatefulWidget {
   const OfferScreen({super.key});
@@ -73,7 +73,6 @@ class _OfferScreenState extends State<OfferScreen> {
                     fontSize: 40.sp,
                     color: Colors.black54,
                   ),
-
                 ),
               ),
               const GridWrap(),
@@ -122,8 +121,8 @@ class _OfferScreenState extends State<OfferScreen> {
 
   Widget _buildBanner(BuildContext context) {
     return Container(
-      height: 350.h,
       padding: EdgeInsets.symmetric(horizontal: 0.w),
+      height: 350.h,
       width: context.screenWidth - 120.w,
       child: CarouselSliderWidget(
           height: 300.h,
@@ -133,15 +132,19 @@ class _OfferScreenState extends State<OfferScreen> {
             return Container(
               // height: 150.h,
               margin: EdgeInsets.symmetric(horizontal: 20.w),
-              padding: EdgeInsets.symmetric(horizontal: 80.w),
+              // padding: EdgeInsets.symmetric(horizontal: 80.w),
               decoration: BoxDecoration(
                 color: Colors.red,
-                image: const DecorationImage(
-                  image: NetworkImage(
-                      'https://www.hoistcrane.com/wp-content/uploads/2017/05/Header-stock-photo-portrait-of-construction-worker-on-building-site-303643508-e1495218037891.jpg'),
-                  fit: BoxFit.cover,
-                ),
                 borderRadius: BorderRadius.circular(20),
+              ),
+              child: ImageFromInternet(
+                height: 350.h,
+                width: context.screenWidth - 120.w,
+                borderRadius: BorderRadius.circular(20),
+                image:
+                    'https://www.hoistcrane.com/wp-content/uploads/2017/05/Header-stock-photo-portrait-of-construction-worker-on-building-site-303643508-e1495218037891.jpg',
+                isCircle: false,
+                fit: BoxFit.fill,
               ),
             );
           })),

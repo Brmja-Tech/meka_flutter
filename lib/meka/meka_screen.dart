@@ -43,6 +43,7 @@ class _MekaScreenState extends State<MekaScreen> {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+
             // Horizontal padding
             decoration: BoxDecoration(
               color: Colors.white,

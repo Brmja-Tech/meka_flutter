@@ -9,6 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:meka/core/extensions/color_extension.dart';
 import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/localization/locale_keys.g.dart';
+import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/stateful/custom_text_field.dart';
 import 'package:meka/core/stateless/custom_button.dart';
 import 'package:meka/core/stateless/gaps.dart';
@@ -93,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Gaps.vertical(context.screenHeight * 0.04),
             CustomElevatedButton(
               text: LocaleKeys.login.tr(),
-              height: 90.h,
+              // height: 90.h,
               width: context.screenWidth * 0.8,
               radius: 15,
               textStyle: context.theme.textTheme.bodyLarge!
@@ -132,7 +133,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   Gaps.h48(),
                   InkWell(
                       onTap: () {
-                        context.read<AuthBloc>().facebookSignIn(0, 'user');
+                        ApiConsumer apiConsumer = sl<ApiConsumer>();
+                        const fcmToken = 'fWq_BTniSdGs9oKpchPFkj:APA91bFIcJ3WA0x85ZPPlonu_ZlPOFU_RBIlSCtwNbJO5EY2YlXXEkSKnsZJd2M5iL3BFuGoMH9jfw-2QE7mHA3rOh5lVnpwGJMiGmDwvRB5uPKEkvFik6I';
+                        const serverToken = 'ya29.c.c0ASRK0GYNNzMYrgSg6r1Pi5t9FXmkAzIu_zQky41qud191eSv5uPgKOoB8ZJovHtihi23lqH-IJEZ9I9Mcw0_5vuIWr1anrT3eAFk2rgNFpTo40SSY8W340Mf_mz-YmKYjNP6qOz_ioOoPUUeT6CB6K4FQ6Lk0qRWnjNugtdi6GQv0RRI380iOuGNxPfYCiPvnVbQa7O5U_MEPoijkwwOdE2WAgpkjqkVR2SsIoXZiLfUIw2bXgU3hlbcx91e3MSy9GN5nmPHuE8FouSteOXQH2SgRyRh2NfT6dkoq3mmRxaeQ2-TaSCn0GiYdmpygQSc2DRTOIqxp8aJW8_d-orG1CS24B77vKJRl9snq7mV7I29sl31d-qNeQqhMwG387AnZVWXlm_ibrkY9OZ7SXnQ-BFVlz6bB_UrOZeYMsckX-c7M-1oaOBxvItoIxZ5qhqglOQmBhQwOBXt1w9c07jzs5t-XiwgOkbWXrshi_y6vy0WasY1Zwxn28oqbRwiSaMxq0BzsROfWZWej9sdZgiVleQUpVojJZ_ZMp2dd49R2YeVvttjcbWt6zQt1twyaF8VsUJutkkiJQ9dZRmgtxr3fqRSmXRsitzXncbq1n7lyZaol_37zY8ypuIYd8czMQibwr2bWY7o7yOfcZRelojM07Rirk9Yf2d8Z5UbXlnjZUh0JOQfycRe2r00-0Ov_-zc8g4UFR26Rsq9FFySOQt_mbetJeFcl0gYfrMIu0x2_RBnWy_FnZO4Z1lsU52sdM2nUtYxw8najjIaRsYf-scsqb4cpOVB920_sOWnR_YZVQ2rM5rsekJ1jpYt2oB45xQquYx2bzWjYu5goeJ18zJv21ppSRF1Q39gd1x5z3Yeqti6aMYcuiUq2RoMn7dk5seIQ_OnqhFqgzYeduhUbp_s-OixoyYFpZ_Ugjyqp-2Rh3IxxRpYBSzy43mrIdeSadJ-JsMJdkYcy_xW1kkF3Vocgcchbjwie9yZ2FJkvn5zIB_fsWXs7QvX7BR';
+                        final notificationPayload = {
+                          "notification": {
+                            "title": "Test Notification",
+                            "body": "This is a test notification from Flutter.",
+                          },
+                          "data": {
+                            "key1": "value1",
+                            "key2": "value2",
+                          },
+                        };
+                        apiConsumer.sendNotification(fcmToken: fcmToken, serverToken: serverToken, notificationPayload: notificationPayload);
+                        // context.read<AuthBloc>().facebookSignIn(0, 'user');
                       },
                       child: SvgPicture.asset(
                         'assets/svg/facebook.svg',

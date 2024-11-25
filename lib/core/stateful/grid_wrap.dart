@@ -26,14 +26,14 @@ class GridWrap extends StatelessWidget {
     ];
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       child: GridView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 00.h),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4, // Four items per row
           crossAxisSpacing: 20.w, // Horizontal spacing
           mainAxisSpacing: 20.h, // Vertical spacing
-          childAspectRatio: 0.8, // Adjust aspect ratio if needed
+          childAspectRatio:0.7 , // Adjust aspect ratio if needed
         ),
         itemCount: gridItems.length,
         shrinkWrap: true, // Makes GridView work with flexible parent containers
@@ -41,6 +41,7 @@ class GridWrap extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = gridItems[index];
           return Container(
+
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -56,6 +57,7 @@ class GridWrap extends StatelessWidget {
               // shape: BoxShape.circle,
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Icon(
                   item["icon"],
@@ -66,12 +68,12 @@ class GridWrap extends StatelessWidget {
                 Text(
                   item["title"],
                   textAlign: TextAlign.center,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 20.sp,
                     color: AppColors.secondaryColor,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],

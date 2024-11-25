@@ -28,7 +28,7 @@ class CustomTextField extends StatelessWidget {
       this.minLines = 1,
       this.svgPath,
       this.isLogin = false,
-        this.textInputAction = TextInputAction.next,
+      this.textInputAction = TextInputAction.next,
       required this.obscureText,
       this.textInputType = TextInputType.text,
       this.textAlign,
@@ -43,17 +43,16 @@ class CustomTextField extends StatelessWidget {
       padding:
           const EdgeInsets.all(8.0).add(EdgeInsets.symmetric(horizontal: 13.w)),
       child: Container(
-        constraints: BoxConstraints(
-          minHeight: 50.h,
-          maxHeight: 150.h
-        ),
+        constraints: !isLogin
+            ? BoxConstraints(minHeight: 50.h, maxHeight: 120.h)
+            : const BoxConstraints(),
         child: TextFormField(
           textAlign: textAlign ?? TextAlign.start,
           obscureText: obscureText,
           keyboardType: textInputType,
           minLines: minLines,
           maxLines: maxLines,
-          textInputAction:textInputAction,
+          textInputAction: textInputAction,
           inputFormatters: [
             if (textInputType == TextInputType.number)
               FilteringTextInputFormatter.digitsOnly

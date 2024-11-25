@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/helper/functions.dart';
@@ -80,12 +81,46 @@ abstract final class ApiConsumer {
   void removeAllInterceptors();
 
   void updateHeader(Map<String, dynamic> headers);
+
+  // New method for sending notifications
+  Future<Either<Failure, Map<String, dynamic>>> sendNotification({
+    required String fcmToken,
+    required String serverToken,
+    required Map<String, dynamic> notificationPayload,
+  });
 }
 
 final class BaseApiConsumer implements ApiConsumer {
   final Dio _dio;
 
   BaseApiConsumer({required Dio dio}) : _dio = dio;
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> sendNotification({
+    required String fcmToken,
+    required String serverToken,
+    required Map<String, dynamic> notificationPayload,
+  }) async {
+    const url = 'https://fcm.googleapis.com/fcm/send';
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Access':'application/json',
+      'Authorization': 'Bearer $serverToken',
+    };
+
+    final data = {
+      "to": fcmToken,
+      "notification": notificationPayload['notification'] ?? {},
+      "data": notificationPayload['data'] ?? {},
+    };
+
+    return post(
+      url,
+      data: data,
+      headers: headers,
+    );
+  }
 
   @override
   Future<Either<Failure, Map<String, dynamic>>> get(
@@ -165,9 +200,10 @@ final class BaseApiConsumer implements ApiConsumer {
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress,
       );
-
+      log('right');
       return Right(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
+      log('left $e');
       loggerError(e.toString());
       final failure = _handleDioError(e);
       return Left(failure);
