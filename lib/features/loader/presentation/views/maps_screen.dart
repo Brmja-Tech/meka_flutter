@@ -97,12 +97,19 @@ class _MapsScreenState extends State<MapsScreen> {
             children: [
               GoogleMap(
                 initialCameraPosition: CameraPosition(
-                  target: _currentPosition ?? LatLng(30, 30), // Default location
+                  target: _currentPosition ?? const LatLng(30, 30), // Default location
                   zoom: 14,
                 ),
                 polylines: state.polylines,
                 onMapCreated: (controller) {
                   _mapController = controller;
+                },
+                markers: {
+                  if(state.coordinate!=null)
+                  Marker(
+                    markerId: const MarkerId('currentLocation'),
+                    position: LatLng(state.coordinate!.latitude, state.coordinate!.longitude),
+                  ),
                 },
                 myLocationEnabled: true,
               ),
