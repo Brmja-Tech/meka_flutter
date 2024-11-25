@@ -1,0 +1,102 @@
+{
+           "geocoded_waypoints": [
+              {
+                     "geocoder_status": "OK",
+                     "place_id": "ChIJ15JRU8BFWBQRoP04P0GFZ3Q",
+                     "types": [street_address]
+                },
+              {
+                     "geocoder_status": "OK",
+                     "place_id": "ChIJX0f2qquKXhQR5918ZdRMLHc",
+                     "types": [postal_code]
+                }
+           ],
+           "routes": [
+              {
+                     "bounds": {
+                           "northeast": {lat: 30.1709367, lng: 31.1510959},
+                           "southwest": {lat: 29.9896612, lng: 29.8798334}
+                      }
+                     "copyrights": "Map data ©2024 Google",
+                     "legs": [
+                          {
+                                 "distance": {text: 165 km, value: 164720},
+                                 "duration": {text: 2 hours 11 mins, value: 7847},
+                                 "end_address": "Al Dabaa, Marsa Matrouh Governorate 5000501, Egypt"
+                                 "end_location": {lat: 30.0354484, lng: 29.992609},
+                                 "start_address": "113 King Faisal St, Atati, Al Haram, Giza Governorate 3553011, Eg
+                                  ypt"
+                                 "start_location": {lat: 29.995297, lng: 31.1510143},
+                                 "steps": [
+                                      {
+                                             "distance": {text: 12 m, value: 12},
+                                             "duration": {text: 1 min, value: 2},
+                                             "end_location": {lat: 29.9953367, lng: 31.1511291},
+                                             "html_instructions": "Head <b>east</b> on <b>King Faisal St</b>"
+                                             "polyline": {points: smavDydc}DGW},
+                                           "start_location": {lat: 29.995297, lng: 31.1510143},
+                                           "travel_mode": "DRIVING"
+                                      },
+                                      {
+                                             "distance": {text: 1.7 km, value: 1726},
+                                             "duration": {text: 4 mins, value: 250},
+                                             "end_location": {lat: 29.9901541, lng: 31.1345079},
+                                             "html_instructions": "Make a <b>U-turn</b>",
+                                             "maneuver": "uturn-left",
+                                             "polyline": {
+                                                   "points": "{mavDqec}DQDTbAZjAH\f@fBFL`@fANd@Nb@Pd@Nb@Pd@Nb@v@hBJ
+                                                    PVv@H^b@`A`@hAr@pB?@b@nAJ^BLFXBHDRLlAZ|C@LBZTxCNdCRzBF
+                                                    h@PnA@D\zBLlA@BFb@Ff@DVBND\DNNz@Ll@Pv@DPJh@DPRdANn@\bB
+                                                    J`@Lh@TjA^~ABLDLN^DLL\d@tA"
+                                              }
+                                             "start_location": {lat: 29.9953367, lng: 31.1511291},
+                                             "travel_mode": "DRIVING"
+                                        },
+                                      {
+                                             "distance": {text: 0.4 km, value: 362},
+                                             "duration": {text: 1 min, value: 72},
+                                             "end_location": {lat: 29.9912383, lng: 31.1309907},
+                                             "html_instructions": "Merge onto <b>Al Mansoureya Rd</b>/<wbr/><b>Al Remaia</b>
+                                              /<wbr/><b>Aswan - Giza</b>"
+                                             "maneuver": "merge",
+                                             "polyline": {points: mm`vDu}_}DMj@_@nCAB[lBOx@Kj@[hBIf@Mn@A@I\Q`@_@f@},
+                                             "start_location": {lat: 29.9901541, lng: 31.1345079},
+                                             "travel_mode": "DRIVING"
+                                        },
+                                        {
+                                               "distance": {text: 0.3 km, value: 251},
+                                               "duration": {text: 1 min, value: 30},
+                                               "end_location": {lat: 29.9897292, lng: 31.1290787},
+                                               "html_instructions": "Turn <b>left</b> onto <b>Al Remaia</b>/<wbr/><b>Aswan - G
+                                                iza</b> (signs for <b>6th of October City</b>/<wbr/><b>Giz
+                                                a Pyramids</b>)"
+                                               "maneuver": "turn-left",
+                                               "polyline": {points: gt`vDug_}DFNJXLTDJbAfA\b@TXh@p@JPJJNRLL\j@NL},
+                                             "start_location": {lat: 29.9912383, lng: 31.1309907},
+                                             "travel_mode": "DRIVING"
+                                        },
+                                        {
+                                               "distance": {text: 6.5 km, value: 6549},
+                                               "duration": {text: 9 mins, value: 562},
+                                               "end_location": {lat: 30.0238756, lng: 31.08200029999999},
+                                               "html_instructions": "Slight <b>right</b> onto <b>Cairo - Alexandria Desert Rd<
+                                                /b>"
+                                               "maneuver": "turn-slight-right",
+                                               "polyline": {
+                                                     "points": "yj`vDw{~|DHn@B^?^?RARCN?J?J@LCFGTMRQP_@\kA|@mA~@i@ZYL
+                                                      c@VWRwB|ACBk@`@o@h@g@h@GHuAfB_@b@i@l@_@h@uBvBo@r@wDzEg
+                                                      @r@e@h@W^OTc@x@a@v@a@~@Yj@O^Yn@Ud@_@z@Yj@_@r@Qd@o@tAo@
+                                                      nAc@fAGLa@r@[f@i@|@{@jAc@l@[b@s@dAQT]b@q@v@]f@sAjBMRQT
+                                                  g@r@o@z@k@x@g@r@yBxCY^m@v@aApAEFe@n@i@t@EDoBhCcCxCkBvB
+                                                  UV_CpCq@x@]^wCdD_@d@o@x@m@p@YZ[Zo@f@i@\m@\eB|@cAl@cFnC
+                                                  aFnCoBjAsC|AA?g@XgAl@MHy@h@QJIDA@_@PQHC@gAf@yCzAcAh@y@
+                                                  b@QJw@^yCxAwFbCu@\oD~AiCfAoB|@a@NiBp@aDdA}Ah@cA`@sAr@a
+                                                  @Vc@ZIFQPm@l@a@f@Y^[j@MXUj@W|@EVI`@If@EZIl@IlACf@Ap@?r
+                                                    B@hE@zB?D@b@?vC@xBBzADp@@XBTDVF^L~@PfAFXF\J`@^dBx@nDfA
+                                                    jFVvAVhBTzBJtB"
+                                              }
+                                               "start_location": {lat: 29.9897292, lng: 31.1290787},
+                                               "travel_mode": "DRIVING"
+                                          },
+                                     ......
+                              

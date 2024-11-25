@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/extensions/color_extension.dart';
 import 'package:meka/core/theme/app_colors.dart';
 
-mixin LightTheme on ThemeData {
+mixin LightTheme on ThemeData{
   static ThemeData get theme => ThemeData(
     brightness: Brightness.light,
     primaryColor: AppColors.primaryColor,
@@ -80,4 +80,7 @@ mixin LightTheme on ThemeData {
         borderRadius: BorderRadius.circular(8),
       ),
   ));
+  static ThemeData get darkTheme =>ThemeData(
+
+  );
 }

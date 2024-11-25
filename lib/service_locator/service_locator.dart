@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:meka/core/network/google_map_helper/google_maps_helper.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/endpoints.dart';
 import 'package:meka/service_locator/auth_service_locator.dart';
+import 'package:meka/service_locator/loader_service_locator.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 final sl = GetIt.instance;
@@ -15,7 +17,7 @@ class DI {
         dio: sl(),
       ),
     );
-
+sl.registerLazySingleton(()=>GoogleMapsHelper(sl()));
     // dio
     sl.registerLazySingleton<Dio>(
       () => Dio(
@@ -42,6 +44,7 @@ class DI {
     );
 
     await  AuthServiceLocator.execute(sl: sl);
+    await  LoaderServiceLocator.execute(sl: sl);
 
   }
 }

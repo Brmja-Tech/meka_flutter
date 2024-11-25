@@ -25,6 +25,7 @@ abstract class  LocaleKeys {
   static const confirmPassword = 'confirmPassword';
   static const rider = 'rider';
   static const driver = 'driver';
+  static const maps = 'maps';
   static const newPassword = 'newPassword';
 
 }

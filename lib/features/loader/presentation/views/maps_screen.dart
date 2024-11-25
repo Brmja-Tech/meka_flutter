@@ -1,5 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart' as location;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meka/core/stateless/custom_button.dart';
+import 'package:meka/features/loader/presentation/blocs/loader_cubit.dart';
+import 'package:meka/features/loader/presentation/blocs/loader_state.dart';
+import 'package:meka/features/loader/presentation/widgets/trip_bottom_sheet.dart';
+import 'package:meka/service_locator/service_locator.dart';
 
 class MapsScreen extends StatefulWidget {
   const MapsScreen({super.key});
@@ -9,31 +20,115 @@ class MapsScreen extends StatefulWidget {
 }
 
 class _MapsScreenState extends State<MapsScreen> {
-  // late GoogleMapController _controller;
-  // final LatLng _center = const LatLng(37.42796133580664, -122.085749655962);
-  //
-  // // Markers
-  // Set<Marker> _markers = {};
-  //
-  // // Function to handle map creation
-  // void _onMapCreated(GoogleMapController controller) {
-  //   _controller = controller;
-  //   setState(() {
-  //     _markers.add(
-  //       Marker(
-  //         markerId: MarkerId('some_marker'),
-  //         position: _center,
-  //         infoWindow: InfoWindow(
-  //           title: 'Marker Title',
-  //           snippet: 'Marker Description',
-  //         ),
-  //       ),
-  //     );
-  //   });
-  // }
+  final location.Location _location = location.Location();
+  LatLng? _currentPosition;
+  late GoogleMapController _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  String? currentAddress;
+
+  Future<void> _getAddressFromLatLng() async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        _currentPosition!.latitude,
+        _currentPosition!.longitude,
+      );
+      Placemark place = placemarks[0];
+      setState(() {
+        currentAddress =
+            '${place.street}, ${place.locality}, ${place.administrativeArea}';
+      });
+    } catch (e) {
+      print('Failed to get address: $e');
+      setState(() {
+        currentAddress = 'Unknown location';
+      });
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      bool serviceEnabled = await _location.serviceEnabled();
+      if (!serviceEnabled) {
+        serviceEnabled = await _location.requestService();
+        if (!serviceEnabled) return;
+      }
+
+      location.PermissionStatus permissionGranted =
+          await _location.hasPermission();
+      if (permissionGranted == location.PermissionStatus.denied) {
+        permissionGranted = await _location.requestPermission();
+        if (permissionGranted != location.PermissionStatus.granted) return;
+      }
+
+      final locationData = await _location.getLocation();
+      setState(() {
+        _currentPosition =
+            LatLng(locationData.latitude!, locationData.longitude!);
+      });
+
+      // Move the camera to the current location once initialized
+
+      _mapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: _currentPosition!, zoom: 14),
+        ),
+      );
+    } catch (e) {
+      // Handle errors like location services being disabled
+      print("Error getting location: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column();
+    return BlocProvider(
+      create: (context) => sl<LoaderCubit>(),
+      child: BlocBuilder<LoaderCubit,LoaderState>(
+        builder: (context,state) {
+          log('polyline is ${state.polylines}');
+          return Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: _currentPosition ?? LatLng(30, 30), // Default location
+                  zoom: 14,
+                ),
+                polylines: state.polylines,
+                onMapCreated: (controller) {
+                  _mapController = controller;
+                },
+                myLocationEnabled: true,
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.0.h),
+                child: CustomElevatedButton(
+                  text: 'اطلب الان',
+                  onPressed: () async {
+                    log(' origin is ${_currentPosition!.latitude},${_currentPosition!.longitude}');
+                    await _getAddressFromLatLng();
+                    showTripBottomSheet(context, currentAddress ?? '',
+                      '${_currentPosition!.latitude},${_currentPosition!
+                          .longitude}',);
+                  },
+                  textStyle: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Colors.white),
+                  height: 80.h,
+                  width: MediaQuery.of(context).size.width - 80.w,
+                ),
+              )
+            ],
+          );
+        }
+      ),
+    );
   }
 }

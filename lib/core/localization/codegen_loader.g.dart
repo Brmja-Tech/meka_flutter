@@ -39,6 +39,7 @@ class CodegenLoader extends AssetLoader{
   "confirmPassword": "تأكيد كلمة المرور",
   "rider": "سائق",
   "driver": "عميل",
+  "maps": "خرائط",
   "newPassword": "كلمه المرور الجديدة"
 };
 static const Map<String,dynamic> en = {
@@ -66,6 +67,7 @@ static const Map<String,dynamic> en = {
   "newPassword": "New Password",
   "rider": "Rider",
   "driver": "Driver",
+  "maps": "Maps",
   "confirmPassword": "Confirm Password"
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": ar, "en": en};
