@@ -7,6 +7,7 @@ import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/socket/pusher_consumer.dart';
 import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
+import 'package:meka/features/chat/presentation/views/chat_screen.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
 import 'package:meka/features/maintenance/presentation/views/maintenace_screen.dart';
 import 'package:meka/features/offers/presentation/views/offers_screen.dart';
@@ -21,20 +22,14 @@ class MekaScreen extends StatefulWidget {
 }
 
 class _MekaScreenState extends State<MekaScreen> {
-
-
-
   int _selectedIndex = 0;
 
   // Pages for IndexedStack
   final List<Widget> _pages = [
     const OfferScreen(),
     const MapsScreen(),
-    const MaintenanceScreen(),
-    BlocProvider(
-        create:(_)=>  sl<AuthBloc>(),
-
-        child: const ProfilePage()),
+    const ChatScreen(),
+    BlocProvider(create: (_) => sl<AuthBloc>(), child: const ProfilePage()),
   ];
 
   void _onItemTapped(int index) {
@@ -103,15 +98,14 @@ class _MekaScreenState extends State<MekaScreen> {
                     ),
                     BottomNavigationBarItem(
                       icon: Padding(
-                        padding:  EdgeInsetsDirectional.only(end: 60.w),
+                        padding: EdgeInsetsDirectional.only(end: 60.w),
                         child: SvgPicture.asset('assets/svg/search.svg'),
                       ),
                       label: '',
                     ),
                     BottomNavigationBarItem(
                       icon: Padding(
-                        padding:  EdgeInsetsDirectional.only(start: 60.w),
-
+                        padding: EdgeInsetsDirectional.only(start: 60.w),
                         child: SvgPicture.asset('assets/svg/mail.svg'),
                       ),
                       label: "",
@@ -153,13 +147,8 @@ class _MekaScreenState extends State<MekaScreen> {
   @override
   Future<void> didChangeDependencies() async {
     sl<PusherConsumer>().initialize();
-    sl<ApiConsumer>().updateHeader({
-      "Authorization": ' Bearer ${await CacheManager.getAccessToken()}'
-    });
+    sl<ApiConsumer>().updateHeader(
+        {"Authorization": ' Bearer ${await CacheManager.getAccessToken()}'});
     super.didChangeDependencies();
   }
 }
-
-
-
-

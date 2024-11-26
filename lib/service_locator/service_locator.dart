@@ -18,8 +18,10 @@ class DI {
         dio: sl(),
       ),
     );
-    sl.registerLazySingleton<GoogleMapsConsumer>(() => GoogleMapsConsumerImpl(sl()));
-    sl.registerLazySingleton<PusherConsumer>(() => PusherConsumerImpl(appKey: '95855f2765558883a556',cluster:'mt1'));
+    sl.registerLazySingleton<GoogleMapsConsumer>(
+        () => GoogleMapsConsumerImpl(sl()));
+    sl.registerLazySingleton<PusherConsumer>(() =>
+        PusherConsumerImpl(appKey: '95855f2765558883a556', cluster: 'mt1'));
     // dio
     sl.registerLazySingleton<Dio>(
       () => Dio(

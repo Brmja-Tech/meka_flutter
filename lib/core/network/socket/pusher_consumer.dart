@@ -1,8 +1,11 @@
+import 'package:meka/core/helper/functions.dart';
 import 'package:meka/core/network/cache_helper/cache_manager.dart';
+import 'package:meka/core/network/http/endpoints.dart';
 import 'package:pusher_client/pusher_client.dart';
 
 abstract class PusherConsumer {
   Future<void> initialize();
+
   Future<void> connect();
 
   Future<void> disconnect();
@@ -34,26 +37,30 @@ class PusherConsumerImpl implements PusherConsumer {
 
   @override
   Future<void> initialize() async {
-    final token = await CacheManager.getAccessToken();
+    try {
+      final token = await CacheManager.getAccessToken();
 
-    if (token == null) {
-      throw Exception("Access token is not available.");
-    }
-    _pusherClient = PusherClient(
-      appKey,
-      enableLogging: true,
-      PusherOptions(
-        cluster: cluster,
-        auth: PusherAuth(
-          null,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
+      if (token == null) {
+        throw Exception("Access token is not available.");
+      }
+      _pusherClient = PusherClient(
+        appKey,
+        enableLogging: true,
+        PusherOptions(
+          cluster: cluster,
+          auth: PusherAuth(
+            '${EndPoints.baseUrl}${EndPoints.login}',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          ),
         ),
-      ),
-      autoConnect: false, // Manual connection
-    );
+        autoConnect: false, // Manual connection
+      );
+    } catch (e) {
+      logger('Error whiile init pusher $e');
+    }
   }
 
   // Pusher methods
