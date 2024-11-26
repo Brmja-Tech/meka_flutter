@@ -15,7 +15,7 @@ class LoaderCubit extends Cubit<LoaderState> {
     emit(state.copyWith(status: LoaderStatus.initial));
   }
 
-  void getDirection(String origin, String destination) async {
+  Future<void> getDirection(String origin, String destination) async {
     emit(state.copyWith(status: LoaderStatus.loading));
     final result =
         await sl<GoogleMapsConsumer>().getDirections(origin, destination);

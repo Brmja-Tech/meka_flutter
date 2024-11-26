@@ -164,11 +164,11 @@ void showTripBottomSheet(BuildContext context, String address, String origin) {
                 children: [
                   Expanded(
                     child: BlocListener<LoaderCubit, LoaderState>(
-                      listener: (context, state) {
+                      listener: (context, state) async {
                         if (state.isBolyline) {
-                          context.read<LoaderCubit>().getDirection(origin,
+                          await context.read<LoaderCubit>().getDirection(origin,
                               '${state.coordinate!.latitude},${state.coordinate!.longitude}');
-                          context.pop();
+                          if(context.mounted)context.pop();
                         }
                       },
                       child: BlocBuilder<LoaderCubit, LoaderState>(
@@ -183,7 +183,7 @@ void showTripBottomSheet(BuildContext context, String address, String origin) {
 
                               destination = destinationController.text;
                               if (destination.isNotEmpty) {
-                                // Call the Google Maps API
+                                // coordinates
                                 await context
                                     .read<LoaderCubit>()
                                     .getCoordinates(

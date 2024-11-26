@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:meka/core/network/cache_helper/cache_manager.dart';
+import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/socket/pusher_consumer.dart';
 import 'package:meka/core/theme/app_colors.dart';
+import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
 import 'package:meka/features/maintenance/presentation/views/maintenace_screen.dart';
 import 'package:meka/features/offers/presentation/views/offers_screen.dart';
@@ -27,7 +31,10 @@ class _MekaScreenState extends State<MekaScreen> {
     const OfferScreen(),
     const MapsScreen(),
     const MaintenanceScreen(),
-    const ProfilePage(),
+    BlocProvider(
+        create:(_)=>  sl<AuthBloc>(),
+
+        child: const ProfilePage()),
   ];
 
   void _onItemTapped(int index) {
@@ -144,8 +151,11 @@ class _MekaScreenState extends State<MekaScreen> {
   }
 
   @override
-  void didChangeDependencies() {
+  Future<void> didChangeDependencies() async {
     sl<PusherConsumer>().initialize();
+    sl<ApiConsumer>().updateHeader({
+      "Authorization": ' Bearer ${await CacheManager.getAccessToken()}'
+    });
     super.didChangeDependencies();
   }
 }

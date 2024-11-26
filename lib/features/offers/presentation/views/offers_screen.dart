@@ -111,10 +111,7 @@ class _OfferScreenState extends State<OfferScreen> {
                         .copyWith(color: Colors.grey)),
                 Gaps.h10(),
                 InkWell(
-                  onTap: () {
-                    log('cleared');
-                    CacheManager.clear();
-                  },
+                  onTap: () {},
                   child: Icon(
                     Icons.arrow_downward_sharp,
                     color: Colors.blue[700],

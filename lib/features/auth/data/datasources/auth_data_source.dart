@@ -60,8 +60,9 @@ class AuthDataSourceImpl implements AuthDataSource {
 
   @override
   Future<Either<Failure, void>> logout(NoParams params) async {
-    final result = await _apiConsumer.post(EndPoints.register);
+    final result = await _apiConsumer.post(EndPoints.logout);
     return result.fold((l) => Left(l), (r) {
+      CacheManager.clear();
       return Right(null);
     });
   }
