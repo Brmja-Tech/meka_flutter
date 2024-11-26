@@ -18,7 +18,7 @@ class LoaderCubit extends Cubit<LoaderState> {
   void getDirection(String origin, String destination) async {
     emit(state.copyWith(status: LoaderStatus.loading));
     final result =
-        await sl<GoogleMapsHelper>().getDirections(origin, destination);
+        await sl<GoogleMapsConsumer>().getDirections(origin, destination);
     result.fold((left) {
       emit(state.copyWith(
         status: LoaderStatus.failure,
@@ -79,7 +79,7 @@ class LoaderCubit extends Cubit<LoaderState> {
 
   Future<void> getCoordinates(String destination) async {
     emit(state.copyWith(status: LoaderStatus.loading));
-    final result = await sl<GoogleMapsHelper>().getCoordinates(destination);
+    final result = await sl<GoogleMapsConsumer>().getCoordinates(destination);
     result.fold((left) {
       emit(state.copyWith(
           status: LoaderStatus.failure, errorMessage: left.message));

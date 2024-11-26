@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:meka/core/network/google_map_helper/google_maps_helper.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/endpoints.dart';
+import 'package:meka/core/network/socket/pusher_consumer.dart';
 import 'package:meka/service_locator/auth_service_locator.dart';
 import 'package:meka/service_locator/loader_service_locator.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -17,7 +18,8 @@ class DI {
         dio: sl(),
       ),
     );
-sl.registerLazySingleton(()=>GoogleMapsHelper(sl()));
+    sl.registerLazySingleton(() => GoogleMapsConsumerImpl(sl()));
+    sl.registerLazySingleton(() => PusherConsumerImpl(appKey: '95855f2765558883a556',cluster:'mt1'));
     // dio
     sl.registerLazySingleton<Dio>(
       () => Dio(
@@ -43,8 +45,7 @@ sl.registerLazySingleton(()=>GoogleMapsHelper(sl()));
         ]),
     );
 
-    await  AuthServiceLocator.execute(sl: sl);
-    await  LoaderServiceLocator.execute(sl: sl);
-
+    await AuthServiceLocator.execute(sl: sl);
+    await LoaderServiceLocator.execute(sl: sl);
   }
 }
