@@ -105,7 +105,7 @@ final class BaseApiConsumer implements ApiConsumer {
 
     final headers = {
       'Content-Type': 'application/json',
-      'Access':'application/json',
+      'Access': 'application/json',
       'Authorization': 'Bearer $serverToken',
     };
 
@@ -137,6 +137,7 @@ final class BaseApiConsumer implements ApiConsumer {
         queryParameters: queryParameters,
         options: Options(headers: headers),
         cancelToken: cancelToken,
+        data: data,
         onReceiveProgress: onReceiveProgress,
       );
 
@@ -167,6 +168,8 @@ final class BaseApiConsumer implements ApiConsumer {
         queryParameters: queryParameters,
         options: Options(headers: headers),
         cancelToken: cancelToken,
+        data: data,
+        onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
 
@@ -197,6 +200,8 @@ final class BaseApiConsumer implements ApiConsumer {
         url,
         queryParameters: queryParameters,
         options: Options(headers: headers),
+        data: data,
+        onSendProgress: onSendProgress,
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress,
       );
@@ -229,6 +234,8 @@ final class BaseApiConsumer implements ApiConsumer {
         queryParameters: queryParameters,
         options: Options(headers: headers),
         cancelToken: cancelToken,
+        data: data,
+        onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
 
@@ -257,6 +264,7 @@ final class BaseApiConsumer implements ApiConsumer {
       Response response = await _dio.delete(
         url,
         queryParameters: queryParameters,
+        data: data,
         options: Options(headers: headers),
         cancelToken: cancelToken,
       );

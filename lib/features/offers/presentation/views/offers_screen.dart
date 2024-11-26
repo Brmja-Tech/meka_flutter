@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/extensions/color_extension.dart';
 import 'package:meka/core/extensions/context.extension.dart';
+import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/stateful/carousel_slider_widget.dart';
 import 'package:meka/core/stateful/custom_text_field.dart';
 import 'package:meka/core/stateful/grid_wrap.dart';
@@ -107,9 +110,15 @@ class _OfferScreenState extends State<OfferScreen> {
                     style: context.textTheme.bodyLarge!
                         .copyWith(color: Colors.grey)),
                 Gaps.h10(),
-                Icon(
-                  Icons.arrow_downward_sharp,
-                  color: Colors.blue[700],
+                InkWell(
+                  onTap: () {
+                    log('cleared');
+                    CacheManager.clear();
+                  },
+                  child: Icon(
+                    Icons.arrow_downward_sharp,
+                    color: Colors.blue[700],
+                  ),
                 ),
               ],
             ),

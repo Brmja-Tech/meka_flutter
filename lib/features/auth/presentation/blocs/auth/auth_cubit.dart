@@ -1,6 +1,8 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meka/core/network/base_use_case/base_use_case.dart';
 import 'package:meka/features/auth/data/datasources/auth_data_source.dart';
+import 'package:meka/features/auth/domain/entities/user_entity.dart';
 import 'package:meka/features/auth/domain/usecases/facebook_sign_in_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/google_sign_in_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/login_use_case.dart';
@@ -20,14 +22,20 @@ class AuthBloc extends Cubit<AuthState> {
       : super(const AuthState());
 
   Future<void> login(
-      String email, String password, int role, String type) async {
+      String email, String password) async {
+        final token = await FirebaseMessaging.instance.getToken()??'';
     emit(state.copyWith(status: AuthStatus.loading));
     final result = await _loginUseCase(
-        LoginParams(email: email, password: password, role: role, type: type));
+        LoginParams(email: email, password: password,fcmToken: token));
     result.fold(
-      (l) => emit(
-          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.success)),
+      (l) {
+        emit(
+          state.copyWith(status: AuthStatus.failure, errorMessage: l.message));
+      },
+      (r) {
+        UserEntity? user = r;
+        emit(state.copyWith(status: AuthStatus.success,user: user));
+      },
     );
   }
 
@@ -53,23 +61,27 @@ class AuthBloc extends Cubit<AuthState> {
   }
 
   Future<void> googleSignIn(int role, String type) async {
+        final token = await FirebaseMessaging.instance.getToken()??'';
+
     emit(state.copyWith(status: AuthStatus.loading));
-    final result =
-        await _googleSignInUseCase(LoginParams(role: role, type: type));
-    result.fold(
-      (l) => emit(
-          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.success)),
-    );
+    // final result =
+    //     await _googleSignInUseCase(LoginParams(role: role, type: type, fcmToken: token));
+    // result.fold(
+    //   (l) => emit(
+    //       state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+    //   (r) => emit(state.copyWith(status: AuthStatus.success)),
+    // );
   }
   Future<void> facebookSignIn(int role, String type) async {
+        final token = await FirebaseMessaging.instance.getToken() ?? '';
+
     emit(state.copyWith(status: AuthStatus.loading));
-    final result =
-        await _facebookSignInUseCase(LoginParams(role: role, type: type));
-    result.fold(
-      (l) => emit(
-          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.success)),
-    );
+    // final result =
+    //     await _facebookSignInUseCase(LoginParams(role: role, type: type, fcmToken: token));
+    // result.fold(
+    //   (l) => emit(
+    //       state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+    //   (r) => emit(state.copyWith(status: AuthStatus.success)),
+    // );
   }
 }

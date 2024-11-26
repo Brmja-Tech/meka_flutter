@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:meka/core/network/socket/pusher_consumer.dart';
 import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
 import 'package:meka/features/maintenance/presentation/views/maintenace_screen.dart';
 import 'package:meka/features/offers/presentation/views/offers_screen.dart';
 import 'package:meka/features/profile/presentation/views/profile_screen.dart';
+import 'package:meka/service_locator/service_locator.dart';
 
 class MekaScreen extends StatefulWidget {
   const MekaScreen({super.key});
@@ -15,6 +17,9 @@ class MekaScreen extends StatefulWidget {
 }
 
 class _MekaScreenState extends State<MekaScreen> {
+
+
+
   int _selectedIndex = 0;
 
   // Pages for IndexedStack
@@ -136,6 +141,12 @@ class _MekaScreenState extends State<MekaScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    sl<PusherConsumer>().initialize();
+    super.didChangeDependencies();
   }
 }
 

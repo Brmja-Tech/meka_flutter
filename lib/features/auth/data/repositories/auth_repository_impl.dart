@@ -3,6 +3,7 @@ import 'package:meka/core/network/failure/failure.dart';
 import 'package:meka/core/network/http/either.dart';
 
 import 'package:meka/features/auth/data/datasources/auth_data_source.dart';
+import 'package:meka/features/auth/data/models/user_model.dart';
 
 import '../../domain/repositories/auth_repository.dart';
 
@@ -12,7 +13,7 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._authDataSource);
 
   @override
-  Future<Either<Failure, void>> login(LoginParams params) {
+  Future<Either<Failure, UserModel>> login(LoginParams params) {
     return _authDataSource.login(params);
   }
 
@@ -30,6 +31,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, void>> googleSignIn(LoginParams params) {
     return _authDataSource.googleLogin(params);
   }
+
   @override
   Future<Either<Failure, void>> facebookSignIn(LoginParams params) {
     return _authDataSource.facebookLogin(params);

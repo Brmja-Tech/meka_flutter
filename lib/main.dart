@@ -8,10 +8,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/localization/translation_service.dart';
+import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/theme/light_theme.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
 import 'package:meka/features/auth/presentation/views/login_screen.dart';
 import 'package:meka/firebase_options.dart';
+import 'package:meka/meka/meka_screen.dart';
 import 'service_locator/service_locator.dart';
 
 Future<void> main() async {
@@ -25,24 +27,29 @@ Future<void> main() async {
     carPlay: true,
     criticalAlert: true,
   );
-  FirebaseMessaging.instance.subscribeToTopic('all');
-  final String fcmToken = await FirebaseMessaging.instance.getToken() ?? '';
-  log('fcm token $fcmToken');
-
+  // FirebaseMessaging.instance.subscribeToTopic('all');
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(LocalizationService.rootWidget(child: const MyApp()));
+  final String? accessToken = await CacheManager.getAccessToken();
+  final Widget initialScreen = (accessToken != null)
+      ? const MekaScreen()
+      : BlocProvider(
+          create: (context) => sl<AuthBloc>(), child: const LoginScreen());
+  runApp(LocalizationService.rootWidget(child: MyApp(initialScreen)));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget _initialScreen;
+  const MyApp(
+    this._initialScreen, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-
     return ScreenUtilInit(
         designSize: const Size(750, 1334),
         minTextAdapt: true,
@@ -53,7 +60,7 @@ class MyApp extends StatelessWidget {
             navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
             theme: LightTheme.theme,
-            home: BlocProvider(create:(context)=>sl<AuthBloc>(), child: const LoginScreen()),
+            home: _initialScreen,
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,

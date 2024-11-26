@@ -8,9 +8,10 @@ import 'package:meka/core/network/firebase_helper/firebase_consumer.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/either.dart';
 import 'package:meka/core/network/http/endpoints.dart';
+import 'package:meka/features/auth/data/models/user_model.dart';
 
 abstract class AuthDataSource {
-  Future<Either<Failure, void>> login(LoginParams params);
+  Future<Either<Failure, UserModel>> login(LoginParams params);
 
   Future<Either<Failure, void>> googleLogin(LoginParams params);
 
@@ -34,13 +35,17 @@ class AuthDataSourceImpl implements AuthDataSource {
   AuthDataSourceImpl(this._apiConsumer);
 
   @override
-  Future<Either<Failure, void>> login(LoginParams params) async {
+  Future<Either<Failure, UserModel>> login(LoginParams params) async {
     final result =
         await _apiConsumer.post(EndPoints.login, data: params.toJson());
-    return result.fold((l) => Left(l), (r) {
-      CacheManager.saveAccessToken(r['access_token']);
-      _apiConsumer.updateHeader(r['access_token']);
-      return Right(null);
+    return result.fold((l) => Left(l), (r) async {
+      log('token is  ${r['data']['token']}');
+      log('user is  ${r['data']['user']}');
+      await CacheManager.saveAccessToken(r['data']['token']);
+      _apiConsumer.updateHeader({"Authorization": ' Bearer ${r['data']['token']}'});
+      final user = UserModel.fromJson(r['data']['user']);
+      log('user is from api ${user.email}');
+      return Right(user);
     });
   }
 
@@ -100,23 +105,23 @@ class AuthDataSourceImpl implements AuthDataSource {
 }
 
 class LoginParams extends Equatable {
-  final String? email;
+  final String email;
   final String? password;
-  final int role;
-  final String type;
 
+  final String? type;
+  final String fcmToken;
   Map<String, dynamic> toJson() => {
         'email': email,
-        'role': role,
-        'type': type,
+        if (type != null) 'type': type,
+        'fcm_token': fcmToken,
         if (password != null) 'password': password,
       };
 
   const LoginParams(
-      {this.email, this.password, required this.role, required this.type});
+      {required this.email, this.password, this.type, required this.fcmToken});
 
   @override
-  List<Object?> get props => [email, password];
+  List<Object?> get props => [email, password, type, fcmToken];
 }
 
 class RegisterParams extends Equatable {

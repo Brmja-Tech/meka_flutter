@@ -9,14 +9,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/localization/locale_keys.g.dart';
-import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/stateful/custom_text_field.dart';
 import 'package:meka/core/stateless/custom_appbar.dart';
 import 'package:meka/core/stateless/custom_button.dart';
 import 'package:meka/core/stateless/gaps.dart';
 import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
-import 'package:meka/meka/meka_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -161,9 +159,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       .copyWith(color: Colors.white),
                   // color: AppCol,
                   onPressed: () async {
-                    await CacheManager.saveRole(isDriver);
-                    if(context.mounted)context.go(const MekaScreen());
-                  },
+                   },
                 ),
                 Gaps.vertical(context.screenHeight * 0.01),
                 RichText(

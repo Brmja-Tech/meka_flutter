@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/extensions/color_extension.dart';
-import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/theme/app_colors.dart';
 
 class GridWrap extends StatelessWidget {

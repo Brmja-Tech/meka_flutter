@@ -2,6 +2,7 @@ import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:pusher_client/pusher_client.dart';
 
 abstract class PusherConsumer {
+  Future<void> initialize();
   Future<void> connect();
 
   Future<void> disconnect();
@@ -31,6 +32,7 @@ class PusherConsumerImpl implements PusherConsumer {
     required this.cluster,
   });
 
+  @override
   Future<void> initialize() async {
     final token = await CacheManager.getAccessToken();
 
