@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:meka/core/network/http/api_consumer.dart';
-import 'package:meka/core/network/http/either.dart';
-import 'package:meka/service_locator/service_locator.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meka/core/extensions/context.extension.dart';
+import 'package:meka/core/theme/app_colors.dart';
+import 'package:meka/features/chat/presentation/views/chat_room_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -13,21 +14,33 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-            onPressed: () async {
-              // final result = await sl<ApiConsumer>().post('chats', data: {
-              //   'title': "Hello World",
-              //   "user_id": 2,
-              // });
-              // result.fold((left)=>Left(left), (r){
-              //
-              // });
-            },
-            child: Text('Send'))
-      ],
+    return Scaffold(
+        body: ListView.builder(
+            shrinkWrap: true,
+            itemCount: 30,
+            itemBuilder: (context, index) {
+              return _buildChatRoomTile();
+            }));
+  }
+
+  Widget _buildChatRoomTile() {
+    return ListTile(
+      style: ListTileStyle.list,
+      onTap: () {
+        context.go(const ChatRoomScreen());
+      },
+      leading: CircleAvatar(
+        radius: 30,
+        backgroundColor: AppColors.secondaryColor,
+        child: const Icon(Icons.person),
+      ),
+      title: Text(
+        'علي مازن',
+        style: context.textTheme.bodyLarge!
+            .copyWith(fontWeight: FontWeight.bold, color: Colors.black),
+      ),
+      subtitle: Text('مرحبا, كيف الحال؟', style: context.textTheme.bodyMedium!),
+      trailing: Text('12:28 ص', style: context.textTheme.bodyMedium!),
     );
   }
 }

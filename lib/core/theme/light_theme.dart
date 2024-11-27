@@ -11,9 +11,9 @@ mixin LightTheme on ThemeData{
     appBarTheme: AppBarTheme(
       color: AppColors.primaryColor,
       elevation: 0,
-      iconTheme: IconThemeData(color: AppColors.secondaryColor),
-      titleTextStyle: TextStyle(
-        color: AppColors.primaryColor,
+      iconTheme: const IconThemeData(color: Colors.white),
+      titleTextStyle: const TextStyle(
+        color: Colors.white,
         fontFamily: 'Poppins',
         fontSize: 20,
         fontWeight: FontWeight.bold,
