@@ -24,5 +24,7 @@
   "rider": "سائق",
   "driver": "عميل",
   "maps": "خرائط",
-  "newPassword": "كلمه المرور الجديدة"
+  "newPassword": "كلمه المرور الجديدة",
+  "changeLanguage": "تغيير اللغه",
+  "logout": "تسجيل خروج"
 }

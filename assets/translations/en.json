@@ -24,6 +24,9 @@
   "rider": "Rider",
   "driver": "Driver",
   "maps": "Maps",
-  "confirmPassword": "Confirm Password"
+  "confirmPassword": "Confirm Password",
+  "logout": "Logout",
+  "changeLanguage": "Change Language"
 }
+
 

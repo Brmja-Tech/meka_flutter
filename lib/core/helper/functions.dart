@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -22,3 +23,8 @@ void logger(message) => Logger().d(message);
 void loggerError(message) => Logger().e(message);
 
 void loggerWarn(message) => Logger().w(message);
+
+
+void changeLang({required Locale locale, required BuildContext context}) {
+  context.setLocale(locale);
+}
