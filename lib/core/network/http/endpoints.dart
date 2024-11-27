@@ -10,7 +10,7 @@ sealed class EndPoints {
   //chat
   static const String createRoom = 'chats';
 
-  static String getRooms(String id) => 'chats/$id';
+  static const  String getRooms = 'chats';
   static const String sendMessage = 'chats';
 
   static String getMessages(String id) => 'chats/$id/replies';

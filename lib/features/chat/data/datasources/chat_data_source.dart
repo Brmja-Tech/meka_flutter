@@ -6,6 +6,8 @@ import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/either.dart';
 import 'package:meka/core/network/http/endpoints.dart';
 import 'package:meka/core/network/socket/pusher_consumer.dart';
+import 'package:meka/features/chat/data/models/chat_model.dart';
+import 'package:meka/features/chat/domain/entities/chat_entity.dart';
 
 abstract class ChatDataSource {
   void listenForMessages();
@@ -16,7 +18,8 @@ abstract class ChatDataSource {
 
   Future<Either<Failure, void>> fetchMessages(String chatId);
 
-  Future<Either<Failure, void>> fetchChatRooms(PaginationParams params);
+  Future<Either<Failure, List<ChatRoomEntity>>> fetchChatRooms(
+      PaginationParams params);
 
   Future<Either<Failure, void>> createChatRoom(CreateRoomParams params);
 }
@@ -64,9 +67,7 @@ class ChatDataSourceImpl extends ChatDataSource {
 
   @override
   Future<Either<Failure, void>> sendMessage(String message) async {
-    final result = await _apiConsumer.post('chats', data: {
-      "message": message
-    });
+    final result = await _apiConsumer.post('chats', data: {"message": message});
     return result.fold((left) => Left(left), (r) => Right(null));
   }
 
@@ -74,20 +75,27 @@ class ChatDataSourceImpl extends ChatDataSource {
   Future<Either<Failure, void>> fetchMessages(String chatId) async {
     final result = await _apiConsumer.get(EndPoints.getMessages(chatId));
     return result.fold((l) => Left(l), (r) {
-      return Right(r);
+      return Right(null);
     });
   }
 
   @override
-  Future<Either<Failure, void>> createChatRoom(CreateRoomParams params) {
-    // TODO: implement createChatRoom
-    throw UnimplementedError();
+  Future<Either<Failure, void>> createChatRoom(CreateRoomParams params) async {
+    final result =
+        await _apiConsumer.post(EndPoints.createRoom, data: params.toJson());
+    return result.fold((l) => Left(l), (r) => Right(null));
   }
 
   @override
-  Future<Either<Failure, void>> fetchChatRooms(PaginationParams params) {
-    // TODO: implement fetchChatRooms
-    throw UnimplementedError();
+  Future<Either<Failure, List<ChatRoomEntity>>> fetchChatRooms(
+      PaginationParams params) async {
+    final result = await _apiConsumer.get(EndPoints.getRooms,
+        queryParameters: params.toJson());
+    return result.fold((l) => Left(l), (r) {
+      final rooms =
+          (r['data'] as List).map((e) => ChatModel.fromJson(e)).toList();
+      return Right(rooms);
+    });
   }
 
   @override
@@ -98,9 +106,18 @@ class ChatDataSourceImpl extends ChatDataSource {
 
 class CreateRoomParams {
   final int userId;
-  final String title;
+  final int? receiverId;
+  final String? title;
 
-  CreateRoomParams({required this.userId, required this.title});
+  CreateRoomParams({
+    required this.userId,
+     this.title,
+    this.receiverId,
+  });
 
-  Map<String, dynamic> toJson() => {"user_id": userId, "title": title};
+  Map<String, dynamic> toJson() => {
+        "user_id": userId,
+        "title": title,
+        if (receiverId != null) "receiver_id": receiverId
+      };
 }

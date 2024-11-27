@@ -1,3 +1,4 @@
+import 'package:meka/core/extensions/string_extension.dart';
 import 'package:meka/features/chat/domain/entities/replies_entity.dart';
 
 class RepliesModel extends RepliesEntity {
@@ -12,7 +13,7 @@ class RepliesModel extends RepliesEntity {
         id: json['id'],
         userId: json['user_id'],
         message: json['message'],
-        createdAt: json['created_at']);
+        createdAt: (json['created_at'] as String).formatUtc(twoLines: false));
   }
 
   Map<String, dynamic> toJson() => {
