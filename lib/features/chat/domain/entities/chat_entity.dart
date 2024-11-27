@@ -1,14 +1,13 @@
 import 'package:equatable/equatable.dart';
+import 'package:meka/features/chat/domain/entities/replies_entity.dart';
 
-class ChatEntity extends Equatable {
+class ChatRoomEntity extends Equatable {
   final int chatId;
-  final List<Replies> replies;
+  final List<RepliesEntity> replies;
 
-  const ChatEntity(this.chatId, this.replies);
+  const ChatRoomEntity(this.chatId, this.replies);
 
   @override
-  // TODO: implement props
   List<Object?> get props => [chatId, replies];
 }
 
-class Replies {}

@@ -4,10 +4,15 @@ import 'package:meka/core/network/http/either.dart';
 import 'package:meka/features/chat/data/datasources/chat_data_source.dart';
 
 abstract class ChatRepository {
-  void setupRealTimeChat();
+  void listenForMessages();
 
-  Future<Either<Failure, void>> sendMessage(SendMessageParams params);
+  void listenForChatRooms();
 
-  Future<Either<Failure, void>> fetchMessages(PaginationParams params);
+  Future<Either<Failure, void>> sendMessage(String message);
 
+  Future<Either<Failure, void>> fetchMessages(String chatId);
+
+  Future<Either<Failure, void>> fetchChatRooms(PaginationParams params);
+
+  Future<Either<Failure, void>> createChatRoom(CreateRoomParams params);
 }

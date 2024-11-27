@@ -1,9 +1,14 @@
-class ChatModel {
-  final int id;
-  final int userId;
+import 'package:meka/features/chat/data/models/replies_model.dart';
+import 'package:meka/features/chat/domain/entities/chat_entity.dart';
 
-  ChatModel(this.id, this.userId);
+class ChatModel extends ChatRoomEntity {
+  const ChatModel(super.chatId, super.replies);
 
+  factory ChatModel.fromJson(Map<String, dynamic> json) {
+    return ChatModel(
+        json['chatId'],
+        (json['replies'] as List)
+            .map((e) => RepliesModel.fromJson(e))
+            .toList());
+  }
 }
-
-class RepliesModel {}
