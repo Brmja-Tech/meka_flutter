@@ -8,27 +8,27 @@ import 'package:meka/features/chat/presentation/blocs/chat_home/chat_cubit.dart'
 import 'package:meka/features/chat/presentation/blocs/chat_home/chat_state.dart';
 
 class ChatList extends StatefulWidget {
-  const ChatList({super.key});
+  final int chatRoomIndex;
+
+  const ChatList({super.key, required this.chatRoomIndex});
 
   @override
   State<ChatList> createState() => _ChatListState();
 }
 
 class _ChatListState extends State<ChatList> {
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+  late ScrollController _scrollController;
 
   @override
   void initState() {
+    _scrollController = context.read<ChatBloc>().scrollController;
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(milliseconds: 100));
       if (_scrollController.hasClients) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(seconds: 1),
+            curve: Curves.ease);
       }
     });
     super.initState();
@@ -39,32 +39,38 @@ class _ChatListState extends State<ChatList> {
     return BlocBuilder<ChatBloc, ChatState>(
       builder: (context, state) {
         return ListView.builder(
-            itemCount: state.chatRooms.length,
+            itemCount: state.chatRooms[widget.chatRoomIndex].replies.length,
             // shrinkWrap: true,
+            controller: _scrollController,
             padding: EdgeInsets.symmetric(vertical: 20.h),
             itemBuilder: (_, index) {
+              final message =
+                  state.chatRooms[widget.chatRoomIndex].replies[index];
               if (index % 2 == 0) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Container(
-                      constraints: BoxConstraints(
-                          minWidth: context.screenWidth * 0.3,
-                          maxWidth: context.screenWidth * 0.7
-                      ),
-                      alignment: AlignmentDirectional.centerEnd,
-                      padding: EdgeInsets.all(15.w),
-                      margin:
-                      EdgeInsets.symmetric(horizontal: 30.w, vertical: 30.h),
-                      // width: context.screenWidth * 0.3,
-                      decoration: BoxDecoration(
-                          color: HexColor.fromHex('#E5EBFC'),
-                          borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(20.r)).add(
-                              BorderRadiusDirectional.only(
-                                  bottomEnd: Radius.circular(20.r)))),
-                      child: const Text(
-                        'Admin Chat ffk sfhk c;sdkhjkf hfoiirn vor jrjof voejre hfref hvuik',
+                    IntrinsicWidth(
+                      child: Container(
+                        constraints: BoxConstraints(
+                            minWidth: context.screenWidth * 0.3,
+                            maxWidth: context.screenWidth * 0.7),
+                        alignment: AlignmentDirectional.centerEnd,
+                        padding: EdgeInsets.all(15.w),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 30.w, vertical: 30.h),
+                        // width: context.screenWidth * 0.3,
+                        decoration: BoxDecoration(
+                            color: HexColor.fromHex('#E5EBFC'),
+                            borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20.r))
+                                .add(BorderRadiusDirectional.only(
+                                    bottomEnd: Radius.circular(20.r)))),
+                        child: Text(
+                          message.message,
+                          style: context.textTheme.bodyLarge!.copyWith(),
+                          textAlign: TextAlign.start,
+                        ),
                       ),
                     ),
                   ],
@@ -73,25 +79,27 @@ class _ChatListState extends State<ChatList> {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Container(
-                    constraints: BoxConstraints(
-                        minWidth: context.screenWidth * 0.3,
-                        maxWidth: context.screenWidth * 0.7
-                    ),
-                    padding: EdgeInsets.all(15.w),
-                    margin: EdgeInsets.symmetric(horizontal: 30.w),
-                    // width: context.screenWidth * 0.3,
-                    alignment: AlignmentDirectional.centerStart,
-                    decoration: BoxDecoration(
-                        color: HexColor.fromHex('#004CFF'),
-                        borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(20.r)).add(
-                            BorderRadiusDirectional.only(
-                                bottomEnd: Radius.circular(20.r)))),
-                    child: Text(
-                      'Driver Chat ffk sfhk c;sdkhjkf hfoiirn vor jrjof voejre hfref hvuik',
-                      style: context.textTheme.bodyLarge!
-                          .copyWith(color: Colors.white),
+                  IntrinsicWidth(
+                    child: Container(
+                      constraints: BoxConstraints(
+                          minWidth: context.screenWidth * 0.3,
+                          maxWidth: context.screenWidth * 0.7),
+                      padding: EdgeInsets.all(15.w),
+                      margin: EdgeInsets.symmetric(horizontal: 30.w),
+                      // width: context.screenWidth * 0.3,
+                      alignment: AlignmentDirectional.centerStart,
+                      decoration: BoxDecoration(
+                          color: HexColor.fromHex('#004CFF'),
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20.r))
+                                  .add(BorderRadiusDirectional.only(
+                                      bottomEnd: Radius.circular(20.r)))),
+                      child: Text(
+                        message.message,
+                        style: context.textTheme.bodyLarge!
+                            .copyWith(color: Colors.white),
+                        textAlign: TextAlign.start,
+                      ),
                     ),
                   ),
                 ],

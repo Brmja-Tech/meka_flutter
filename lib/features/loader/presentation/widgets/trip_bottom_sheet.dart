@@ -21,8 +21,8 @@ void showTripBottomSheet(BuildContext context, String address, String origin) {
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
     builder: (context) {
-      return BlocProvider.value(
-        value:  sl<LoaderCubit>()..resetState(),
+      return BlocProvider(
+        create:(_) =>   sl<LoaderCubit>()..resetState(),
         child: Padding(
           padding: EdgeInsets.only(
             left: 16,

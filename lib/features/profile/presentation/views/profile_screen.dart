@@ -61,6 +61,7 @@ class ProfilePage extends StatelessWidget {
                 leading: const Icon(Icons.logout, color: Colors.red),
                 title:  Text(LocaleKeys.logout.tr()),
                 onTap: () {
+                  // CacheManager.clear();
                   context.read<AuthBloc>().logout();
                 },
               ),

@@ -5,6 +5,7 @@ import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/network/google_map_helper/google_maps_helper.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/endpoints.dart';
+import 'package:meka/core/network/socket/pusher_consts.dart';
 import 'package:meka/core/network/socket/pusher_consumer.dart';
 import 'package:meka/service_locator/auth_service_locator.dart';
 import 'package:meka/service_locator/chat_service_loactor.dart';
@@ -22,8 +23,8 @@ class DI {
     );
     sl.registerLazySingleton<GoogleMapsConsumer>(
         () => GoogleMapsConsumerImpl(sl()));
-    sl.registerLazySingleton<PusherConsumer>(() =>
-        PusherConsumerImpl(appKey: '95855f2765558883a556', cluster: 'mt1'));
+    sl.registerFactory<PusherConsumer>(() =>
+        PusherConsumerImpl(appKey: PusherConsts.PUSHER_APP_KEY, cluster: PusherConsts.CLUSTER));
     // dio
     final String token = await CacheManager.getAccessToken() ?? '';
 

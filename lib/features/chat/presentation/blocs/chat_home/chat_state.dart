@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:meka/features/chat/domain/entities/chat_entity.dart';
 
-enum ChatStateStatus { initial, loading, success, failure }
+enum ChatStateStatus { initial, loading, success, failure, newChat }
 
 extension ChatStateStatusX on ChatState {
   bool get isInitial => status == ChatStateStatus.initial;
@@ -11,6 +11,8 @@ extension ChatStateStatusX on ChatState {
   bool get isSuccess => status == ChatStateStatus.success;
 
   bool get isError => status == ChatStateStatus.failure;
+
+  bool get isNewChat => status == ChatStateStatus.newChat;
 }
 
 class ChatState extends Equatable {

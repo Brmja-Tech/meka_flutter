@@ -1,20 +1,26 @@
-import 'dart:convert';
-import 'package:meka/core/helper/functions.dart';
+import 'dart:developer';
+import 'package:equatable/equatable.dart';
 import 'package:meka/core/network/base_use_case/base_use_case.dart';
 import 'package:meka/core/network/failure/failure.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/either.dart';
 import 'package:meka/core/network/http/endpoints.dart';
+import 'package:meka/core/network/socket/channels.dart';
+import 'package:meka/core/network/socket/events.dart';
 import 'package:meka/core/network/socket/pusher_consumer.dart';
+import 'package:meka/core/typedefs/app_typedefs.dart';
 import 'package:meka/features/chat/data/models/chat_model.dart';
 import 'package:meka/features/chat/domain/entities/chat_entity.dart';
 
 abstract class ChatDataSource {
-  void listenForMessages();
+  void listenForMessages(DynamicListener onEvent);
 
-  void listenForChatRooms();
+  Future<void> closeConnection();
 
-  Future<Either<Failure, void>> sendMessage(String message);
+  //removed because 2 listen for same channel
+  // void listenForChatRooms();
+
+  Future<Either<Failure, void>> sendMessage(SendMessageParams params);
 
   Future<Either<Failure, void>> fetchMessages(String chatId);
 
@@ -31,43 +37,35 @@ class ChatDataSourceImpl extends ChatDataSource {
   ChatDataSourceImpl(this._pusherConsumer, this._apiConsumer);
 
   @override
-  void listenForMessages() {
-    // Subscribe to the channel for chat updates
-    _pusherConsumer
-        .subscribe('new-chat'); // Replace 'chat-channel' with your channel name
-
-    // Bind to a specific event for new messages
-    _pusherConsumer.bind('new-chat', 'chat', (data) {
-      // Parse the incoming message data
-      final message = parseMessageData(data);
-
-      // Handle the new message (e.g., add to the UI or update state)
-      handleNewMessage(message);
-    });
+  Future<void> closeConnection() {
+    return _pusherConsumer.disconnect();
   }
 
-// Helper to parse incoming message data
-  dynamic parseMessageData(String? data) {
-    if (data == null) return null;
+  @override
+  Future<void> listenForMessages(DynamicListener onEvent) async {
     try {
-      return jsonDecode(data);
+      await _pusherConsumer.initialize();
+      await _pusherConsumer.connect();
+      _pusherConsumer.subscribe(PusherChannels.newMessage);
+      _pusherConsumer.bind(PusherChannels.newMessage, EventListeners.newMessage,
+          (data) {
+        try {
+          onEvent(data);
+        } catch (e) {
+          log('Error parsing message: $e');
+        }
+      });
+      log('Listening for new chat messages...');
     } catch (e) {
-      logger('Error parsing message data: $e');
-      return null;
-    }
-  }
-
-// Handle the new message
-  void handleNewMessage(dynamic message) {
-    if (message != null) {
-      // Update your chat UI or state management here
-      logger('Received new message: $message');
+      log('Error initializing or subscribing to Pusher: $e');
     }
   }
 
   @override
-  Future<Either<Failure, void>> sendMessage(String message) async {
-    final result = await _apiConsumer.post('chats', data: {"message": message});
+  Future<Either<Failure, void>> sendMessage(SendMessageParams params) async {
+    final result = await _apiConsumer.post(
+        EndPoints.sendMessage(params.roomId.toString()),
+        data: params.toJson());
     return result.fold((left) => Left(left), (r) => Right(null));
   }
 
@@ -97,11 +95,6 @@ class ChatDataSourceImpl extends ChatDataSource {
       return Right(rooms);
     });
   }
-
-  @override
-  void listenForChatRooms() {
-    // TODO: implement listenForChatRooms
-  }
 }
 
 class CreateRoomParams {
@@ -111,7 +104,7 @@ class CreateRoomParams {
 
   CreateRoomParams({
     required this.userId,
-     this.title,
+    this.title,
     this.receiverId,
   });
 
@@ -120,4 +113,18 @@ class CreateRoomParams {
         "title": title,
         if (receiverId != null) "receiver_id": receiverId
       };
+}
+
+class SendMessageParams extends Equatable {
+  final String message;
+  final int roomId;
+
+  const SendMessageParams({required this.message, required this.roomId});
+
+  Map<String, dynamic> toJson() => {
+        "message": message,
+      };
+
+  @override
+  List<Object?> get props => [message, roomId];
 }

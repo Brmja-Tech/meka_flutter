@@ -89,53 +89,57 @@ class _MapsScreenState extends State<MapsScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => sl<LoaderCubit>(),
-      child: BlocBuilder<LoaderCubit,LoaderState>(
-        builder: (context,state) {
-          log('polyline is ${state.polylines}');
-          return Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: _currentPosition ?? const LatLng(30, 30), // Default location
-                  zoom: 14,
-                ),
-                polylines: state.polylines,
-                onMapCreated: (controller) {
-                  _mapController = controller;
-                },
-                markers: {
-                  if(state.coordinate!=null)
+      child: BlocBuilder<LoaderCubit, LoaderState>(builder: (context, state) {
+        log('polyline is ${state.polylines}');
+        return Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: _currentPosition ?? const LatLng(30, 30),
+                // Default location
+                zoom: 14,
+              ),
+              polylines: state.polylines,
+              onMapCreated: (controller) {
+                _mapController = controller;
+              },
+              markers: {
+                if (state.coordinate != null)
                   Marker(
                     markerId: const MarkerId('currentLocation'),
-                    position: LatLng(state.coordinate!.latitude, state.coordinate!.longitude),
+                    position: LatLng(state.coordinate!.latitude,
+                        state.coordinate!.longitude),
                   ),
+              },
+              myLocationEnabled: true,
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 30.0.h),
+              child: CustomElevatedButton(
+                text: 'اطلب الان',
+                onPressed: () async {
+                  log(' origin is ${_currentPosition!.latitude},${_currentPosition!.longitude}');
+                  await _getAddressFromLatLng();
+                  showTripBottomSheet(
+                    context,
+                    currentAddress ?? '',
+                    _currentPosition == null
+                        ? ''
+                        : '${_currentPosition!.latitude},${_currentPosition!.longitude}',
+                  );
                 },
-                myLocationEnabled: true,
+                textStyle: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(color: Colors.white),
+                height: 80.h,
+                width: MediaQuery.of(context).size.width - 80.w,
               ),
-              Padding(
-                padding: EdgeInsets.only(bottom: 30.0.h),
-                child: CustomElevatedButton(
-                  text: 'اطلب الان',
-                  onPressed: () async {
-                    log(' origin is ${_currentPosition!.latitude},${_currentPosition!.longitude}');
-                    await _getAddressFromLatLng();
-                    showTripBottomSheet(context, currentAddress ?? '',
-                      '${_currentPosition!.latitude},${_currentPosition!
-                          .longitude}',);
-                  },
-                  textStyle: Theme.of(context)
-                      .textTheme
-                      .bodyLarge!
-                      .copyWith(color: Colors.white),
-                  height: 80.h,
-                  width: MediaQuery.of(context).size.width - 80.w,
-                ),
-              )
-            ],
-          );
-        }
-      ),
+            )
+          ],
+        );
+      }),
     );
   }
 }

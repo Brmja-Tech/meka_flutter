@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meka/core/extensions/context.extension.dart';
+import 'package:meka/features/chat/presentation/blocs/chat_home/chat_cubit.dart';
 
 class ChatBottomTextField extends StatefulWidget {
-  const ChatBottomTextField({super.key});
+  final int roomId;
+  const ChatBottomTextField({super.key, required this.roomId});
 
   @override
   State<ChatBottomTextField> createState() => _ChatBottomTextFieldState();
@@ -27,7 +32,7 @@ class _ChatBottomTextFieldState extends State<ChatBottomTextField> {
   void _sendMessage() {
     if (_messageTextController.text.trim().isNotEmpty) {
       // Add logic to send the message here
-      print("Message Sent: ${_messageTextController.text}");
+     context.read<ChatBloc>().sendMessage(_messageTextController.text.trim(),widget.roomId);
       _messageTextController.clear();
       _messageFocusNode.unfocus();
     }
@@ -52,6 +57,10 @@ class _ChatBottomTextFieldState extends State<ChatBottomTextField> {
         children: [
           Expanded(
             child: Container(
+              constraints: BoxConstraints(
+                minHeight: 40.h,
+                maxHeight: context.screenHeight*0.1
+              ),
               decoration: BoxDecoration(
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(25),
