@@ -1,12 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/network/google_map_helper/google_maps_helper.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/endpoints.dart';
 import 'package:meka/core/network/socket/pusher_consts.dart';
 import 'package:meka/core/network/socket/pusher_consumer.dart';
+import 'package:meka/main.dart';
 import 'package:meka/service_locator/auth_service_locator.dart';
 import 'package:meka/service_locator/chat_service_loactor.dart';
 import 'package:meka/service_locator/loader_service_locator.dart';
@@ -39,6 +41,7 @@ class DI {
               'Content-Type': 'application/json',
               'Cache-Control': 'no-cache',
               'Pragma': 'no-cache',
+              'Accept-Language':navigatorKey.currentContext!.isArabic?'ar':'en',
               'Authorization': 'Bearer $token',
             },
           ),

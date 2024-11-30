@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -11,6 +9,7 @@ import 'package:meka/core/localization/translation_service.dart';
 import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/theme/light_theme.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
+import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/auth/presentation/views/login_screen.dart';
 import 'package:meka/firebase_options.dart';
 import 'package:meka/meka/meka_screen.dart';
@@ -43,6 +42,7 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   final Widget _initialScreen;
+
   const MyApp(
     this._initialScreen, {
     super.key,
@@ -50,22 +50,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-        designSize: const Size(750, 1334),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (context, child) {
-          return MaterialApp(
-            title: 'Meka',
-            navigatorKey: navigatorKey,
-            debugShowCheckedModeBanner: false,
-            theme: LightTheme.theme,
-            home: _initialScreen,
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-          );
-        });
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => sl<UserBloc>()),
+      ],
+      child: ScreenUtilInit(
+          designSize: const Size(750, 1334),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (context, child) {
+            return MaterialApp(
+              title: 'Meka',
+              navigatorKey: navigatorKey,
+              debugShowCheckedModeBanner: false,
+              theme: LightTheme.theme,
+              home: _initialScreen,
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              locale: context.locale,
+            );
+          }),
+    );
   }
 }
 

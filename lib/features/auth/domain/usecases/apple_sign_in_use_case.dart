@@ -4,13 +4,13 @@ import 'package:meka/core/network/http/either.dart';
 import 'package:meka/features/auth/data/datasources/auth_data_source.dart';
 import 'package:meka/features/auth/domain/repositories/auth_repository.dart';
 
-class GoogleSignInUseCase extends BaseUseCase<void, SocialAuthParams>{
+class AppleSignInUseCase extends BaseUseCase<void, SocialAuthParams>{
   final AuthRepository _authRepository;
 
-  GoogleSignInUseCase(this._authRepository);
+  AppleSignInUseCase(this._authRepository);
 
   @override
   Future<Either<Failure, void>> call(SocialAuthParams params) {
-    return _authRepository.googleLogin(params);
+    return _authRepository.appleLogin(params);
   }
 }

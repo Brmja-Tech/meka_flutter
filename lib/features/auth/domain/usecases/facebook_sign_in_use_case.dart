@@ -4,13 +4,13 @@ import 'package:meka/core/network/http/either.dart';
 import 'package:meka/features/auth/data/datasources/auth_data_source.dart';
 import 'package:meka/features/auth/domain/repositories/auth_repository.dart';
 
-class FacebookSignInUseCase extends BaseUseCase<void, LoginParams>{
+class FacebookSignInUseCase extends BaseUseCase<void, SocialAuthParams>{
   final AuthRepository _authRepository;
 
   FacebookSignInUseCase(this._authRepository);
 
   @override
-  Future<Either<Failure, void>> call(LoginParams params) {
-    return _authRepository.facebookSignIn(params);
+  Future<Either<Failure, void>> call(SocialAuthParams params) {
+    return _authRepository.facebookLogin(params);
   }
 }

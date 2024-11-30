@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/extensions/color_extension.dart';
 import 'package:meka/core/extensions/context.extension.dart';
+import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/chat/presentation/blocs/chat_home/chat_cubit.dart';
 import 'package:meka/features/chat/presentation/blocs/chat_home/chat_state.dart';
 
@@ -54,9 +55,10 @@ class _ChatListState extends State<ChatList> {
               controller: _scrollController,
               padding: EdgeInsets.symmetric(vertical: 20.h),
               itemBuilder: (_, index) {
+                final user = context.read<UserBloc>().state.user;
                 final message =
                     state.chatRooms[widget.chatRoomIndex].replies[index];
-                if (index % 2 == 0) {
+                if (message.userId == user!.id) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [

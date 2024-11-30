@@ -3,11 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meka/core/network/base_use_case/base_use_case.dart';
 import 'package:meka/features/auth/data/datasources/auth_data_source.dart';
 import 'package:meka/features/auth/domain/entities/user_entity.dart';
+import 'package:meka/features/auth/domain/usecases/apple_sign_in_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/facebook_sign_in_use_case.dart';
+import 'package:meka/features/auth/domain/usecases/forgot_password_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/google_sign_in_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/login_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/logout_use_case.dart';
+import 'package:meka/features/auth/domain/usecases/otp_verify_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/register_use_case.dart';
+import 'package:meka/features/auth/domain/usecases/reset_password_use_case.dart';
+import 'package:meka/features/auth/domain/usecases/send_otp_use_case.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_state.dart';
 
 class AuthBloc extends Cubit<AuthState> {
@@ -16,25 +21,38 @@ class AuthBloc extends Cubit<AuthState> {
   final RegisterUseCase _registerUseCase;
   final GoogleSignInUseCase _googleSignInUseCase;
   final FacebookSignInUseCase _facebookSignInUseCase;
+  final AppleSignInUseCase _appleSignInUseCase;
+  final ForgotPasswordUseCase _forgotPasswordUseCase;
+  final SendOTPUseCase _sendOTPUseCase;
+  final ResetPasswordUseCase _resetPasswordUseCase;
+  final OtpVerifyUseCase _otpVerifyUseCase;
 
-  AuthBloc(this._logoutUseCase, this._loginUseCase, this._registerUseCase,
-      this._facebookSignInUseCase, this._googleSignInUseCase)
+  AuthBloc(
+      this._logoutUseCase,
+      this._loginUseCase,
+      this._registerUseCase,
+      this._facebookSignInUseCase,
+      this._googleSignInUseCase,
+      this._appleSignInUseCase,
+      this._forgotPasswordUseCase,
+      this._sendOTPUseCase,
+      this._resetPasswordUseCase,
+      this._otpVerifyUseCase)
       : super(const AuthState());
 
-  Future<void> login(
-      String email, String password) async {
-        final token = await FirebaseMessaging.instance.getToken()??'';
+  Future<void> login(String email, String password) async {
+    final token = await FirebaseMessaging.instance.getToken() ?? '';
     emit(state.copyWith(status: AuthStatus.loading));
     final result = await _loginUseCase(
-        LoginParams(email: email, password: password,fcmToken: token));
+        LoginParams(email: email, password: password, fcmToken: token));
     result.fold(
       (l) {
-        emit(
-          state.copyWith(status: AuthStatus.failure, errorMessage: l.message));
+        emit(state.copyWith(
+            status: AuthStatus.failure, errorMessage: l.message));
       },
       (r) {
         UserEntity? user = r;
-        emit(state.copyWith(status: AuthStatus.success,user: user));
+        emit(state.copyWith(status: AuthStatus.success, user: user));
       },
     );
   }
@@ -49,10 +67,10 @@ class AuthBloc extends Cubit<AuthState> {
     );
   }
 
-  Future<void> register(String email, String password) async {
+  Future<void> register(String email, String password,String name,String phone,int  type) async {
     emit(state.copyWith(status: AuthStatus.loading));
     final result = await _registerUseCase(
-        RegisterParams(email: email, password: password));
+        RegisterParams(email: email, password: password,name: name,phone: phone,type: type));
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
@@ -61,7 +79,7 @@ class AuthBloc extends Cubit<AuthState> {
   }
 
   Future<void> googleSignIn(int role, String type) async {
-        final token = await FirebaseMessaging.instance.getToken()??'';
+    final token = await FirebaseMessaging.instance.getToken() ?? '';
 
     emit(state.copyWith(status: AuthStatus.loading));
     // final result =
@@ -72,8 +90,9 @@ class AuthBloc extends Cubit<AuthState> {
     //   (r) => emit(state.copyWith(status: AuthStatus.success)),
     // );
   }
+
   Future<void> facebookSignIn(int role, String type) async {
-        final token = await FirebaseMessaging.instance.getToken() ?? '';
+    final token = await FirebaseMessaging.instance.getToken() ?? '';
 
     emit(state.copyWith(status: AuthStatus.loading));
     // final result =

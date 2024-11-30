@@ -4,12 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
-import 'package:meka/core/network/socket/pusher_consumer.dart';
 import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
+import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/chat/presentation/views/chat_screen.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
-import 'package:meka/features/maintenance/presentation/views/maintenace_screen.dart';
 import 'package:meka/features/offers/presentation/views/offers_screen.dart';
 import 'package:meka/features/profile/presentation/views/profile_screen.dart';
 import 'package:meka/service_locator/service_locator.dart';
@@ -146,7 +145,7 @@ class _MekaScreenState extends State<MekaScreen> {
 
   @override
   Future<void> didChangeDependencies() async {
-    sl<PusherConsumer>().initialize();
+    context.read<UserBloc>().getUser();
     sl<ApiConsumer>().updateHeader(
         {"Authorization": ' Bearer ${await CacheManager.getAccessToken()}'});
     super.didChangeDependencies();
