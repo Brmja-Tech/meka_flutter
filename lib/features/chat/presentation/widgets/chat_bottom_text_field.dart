@@ -18,7 +18,7 @@ class _ChatBottomTextFieldState extends State<ChatBottomTextField> {
 
   @override
   void initState() {
-    _messageFocusNode.requestFocus();
+    // _messageFocusNode.requestFocus();
     super.initState();
   }
 
@@ -31,7 +31,6 @@ class _ChatBottomTextFieldState extends State<ChatBottomTextField> {
 
   void _sendMessage() {
     if (_messageTextController.text.trim().isNotEmpty) {
-      // Add logic to send the message here
      context.read<ChatBloc>().sendMessage(_messageTextController.text.trim(),widget.roomId);
       _messageTextController.clear();
       _messageFocusNode.unfocus();
