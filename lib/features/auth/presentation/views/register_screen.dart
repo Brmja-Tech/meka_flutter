@@ -109,9 +109,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     prefixPath: 'assets/svg/lock.svg',
                     controller: _passwordController,
-                    textAlign: _confirmPasswordController.text.isEmpty
-                        ? TextAlign.start
-                        : TextAlign.center,
+                    textAlign: TextAlign.start,
+
                     textInputType: TextInputType.visiblePassword,
                   ),
                   Gaps.vertical(context.screenHeight * 0.001),
@@ -122,9 +121,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     prefixPath: 'assets/svg/lock.svg',
                     obscureText: true,
                     controller: _confirmPasswordController,
-                    textAlign: _confirmPasswordController.text.isEmpty
-                        ? TextAlign.start
-                        : TextAlign.center,
+                    textAlign: TextAlign.start,
                     textInputType: TextInputType.visiblePassword,
                     validator: (value) {
                       if (value!.isEmpty) {
