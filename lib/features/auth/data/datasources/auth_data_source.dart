@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:meka/core/network/base_use_case/base_use_case.dart';
 import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/network/failure/failure.dart';
@@ -13,17 +14,17 @@ import 'package:meka/features/auth/domain/entities/user_entity.dart';
 abstract class AuthDataSource {
   Future<Either<Failure, void>> register(RegisterParams params);
 
-  Future<Either<Failure, void>> oTPVerify(OTPVerifyParams params);
+  Future<Either<Failure, UserEntity>> oTPVerify(OTPVerifyParams params);
 
   Future<Either<Failure, void>> sendOTP(SendOTPParams params);
 
-  Future<Either<Failure, UserModel>> login(LoginParams params);
+  Future<Either<Failure, UserEntity>> login(LoginParams params);
 
-  Future<Either<Failure, void>> googleLogin(SocialAuthParams params);
+  Future<Either<Failure, void>> googleLogin(NoParams noParams);
 
-  Future<Either<Failure, void>> facebookLogin(SocialAuthParams params);
+  Future<Either<Failure, void>> facebookLogin(NoParams noParams);
 
-  Future<Either<Failure, void>> appleLogin(SocialAuthParams params);
+  Future<Either<Failure, void>> appleLogin(NoParams noParams);
 
   Future<Either<Failure, void>> forgetPassword(ForgetPasswordParams params);
 
@@ -43,9 +44,9 @@ class AuthDataSourceImpl implements AuthDataSource {
   AuthDataSourceImpl(this._apiConsumer);
 
   @override
-  Future<Either<Failure, UserModel>> login(LoginParams params) async {
+  Future<Either<Failure, UserEntity>> login(LoginParams params) async {
     final result =
-    await _apiConsumer.post(EndPoints.login, data: params.toJson());
+        await _apiConsumer.post(EndPoints.login, data: params.toJson());
     return result.fold((l) => Left(l), (r) async {
       log('token is  ${r['data']['token']}');
       log('user is  ${r['data']['user']}');
@@ -61,7 +62,7 @@ class AuthDataSourceImpl implements AuthDataSource {
   @override
   Future<Either<Failure, void>> register(RegisterParams params) async {
     final result =
-    await _apiConsumer.post(EndPoints.register, data: params.toJson());
+        await _apiConsumer.post(EndPoints.register, data: params.toJson());
     return result.fold((l) => Left(l), (r) {
       return Right(null);
     });
@@ -77,26 +78,33 @@ class AuthDataSourceImpl implements AuthDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> appleLogin(SocialAuthParams params) {
+  Future<Either<Failure, void>> appleLogin(NoParams noParams) {
     // TODO: implement appleLogin
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<Failure, void>> facebookLogin(SocialAuthParams params) async {
+  Future<Either<Failure, void>> facebookLogin(NoParams noParams) async {
     final result = await _firebaseApiConsumer.loginWithFacebook();
     return result.fold((l) => Left(l), (r) {
-      log('token is ${r.uid}');
+      log('token is ${r.user!.uid}');
 
       return Right(null);
     });
   }
 
   @override
-  Future<Either<Failure, void>> googleLogin(SocialAuthParams params) async {
+  Future<Either<Failure, void>> googleLogin(NoParams noParams) async {
     final result = await _firebaseApiConsumer.loginWithGoogle();
-    return result.fold((l) => Left(l), (r) {
-      // login(LoginParams(email: r.email!, role: params.role, type: params.type));
+    return result.fold((l) => Left(l), (r) async {
+      final fcmToken = await FirebaseMessaging.instance.getToken() ?? '';
+      _socialLogin(SocialAuthParams(
+        email: r.user!.email!,
+        name: r.user!.displayName!,
+        providerType: 'google',
+        providerId: r.credential!.providerId,
+        fcmToken: fcmToken,
+      ));
       return Right(null);
     });
   }
@@ -110,7 +118,7 @@ class AuthDataSourceImpl implements AuthDataSource {
   @override
   Future<Either<Failure, void>> sendOTP(SendOTPParams params) async {
     final result =
-    await _apiConsumer.post(EndPoints.sendOTP, data: params.toJson());
+        await _apiConsumer.post(EndPoints.sendOTP, data: params.toJson());
     return result.fold((l) => Left(l), (r) => Right(null));
   }
 
@@ -131,10 +139,11 @@ class AuthDataSourceImpl implements AuthDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> oTPVerify(OTPVerifyParams params) async {
+  Future<Either<Failure, UserEntity>> oTPVerify(OTPVerifyParams params) async {
     final result =
-    await _apiConsumer.post(EndPoints.verifyOTP, data: params.toJson());
-    return result.fold((l) => Left(l), (r) => Right(null));
+        await _apiConsumer.post(EndPoints.verifyOTP, data: params.toJson());
+    return result.fold(
+        (l) => Left(l), (r) => Right(UserModel.fromJson(r['data'])));
   }
 
   @override
@@ -142,7 +151,15 @@ class AuthDataSourceImpl implements AuthDataSource {
       RegisterParams params) async {
     final result = await _apiConsumer.post(EndPoints.updateProfile);
     return result.fold(
-            (l) => Left(l), (r) => Right(UserModel.fromJson(r['data'])));
+        (l) => Left(l), (r) => Right(UserModel.fromJson(r['data'])));
+  }
+
+  Future<Either<Failure, UserEntity>> _socialLogin(
+      SocialAuthParams params) async {
+    final result =
+        await _apiConsumer.post(EndPoints.socialLogin, data: params.toJson());
+    return result.fold(
+        (l) => Left(l), (r) => Right(UserModel.fromJson(r['data'])));
   }
 }
 
@@ -153,8 +170,7 @@ class LoginParams extends Equatable {
   final String? type;
   final String fcmToken;
 
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'email': email,
         if (type != null) 'type': type,
         'fcm_token': fcmToken,
@@ -175,8 +191,7 @@ class RegisterParams extends Equatable {
   final int type;
   final String name;
 
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'email': email,
         'password': password,
         'type': type,
@@ -185,11 +200,12 @@ class RegisterParams extends Equatable {
         'terms_and_conditions': 1
       };
 
-  const RegisterParams({required this.email,
-    required this.password,
-    required this.phone,
-    required this.type,
-    required this.name});
+  const RegisterParams(
+      {required this.email,
+      required this.password,
+      required this.phone,
+      required this.type,
+      required this.name});
 
   @override
   List<Object?> get props => [email, password, phone, type, name];
@@ -200,12 +216,12 @@ final class ResetPasswordParams extends Equatable {
   final String password;
   final String passwordConfirm;
 
-  const ResetPasswordParams({required this.otp,
-    required this.password,
-    required this.passwordConfirm});
+  const ResetPasswordParams(
+      {required this.otp,
+      required this.password,
+      required this.passwordConfirm});
 
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'otp': otp,
         'password': password,
         'password_confirmation': passwordConfirm
@@ -252,17 +268,17 @@ class SocialAuthParams extends Equatable {
   final String email;
   final String name;
   final String providerType;
-  final int providerId;
+  final String providerId;
   final String fcmToken;
 
-  const SocialAuthParams({required this.email,
-    required this.name,
-    required this.providerType,
-    required this.providerId,
-    required this.fcmToken});
+  const SocialAuthParams(
+      {required this.email,
+      required this.name,
+      required this.providerType,
+      required this.providerId,
+      required this.fcmToken});
 
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'email': email,
         'name': name,
         'provider_type': providerType,

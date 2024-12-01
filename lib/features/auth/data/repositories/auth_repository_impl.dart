@@ -3,7 +3,6 @@ import 'package:meka/core/network/failure/failure.dart';
 import 'package:meka/core/network/http/either.dart';
 
 import 'package:meka/features/auth/data/datasources/auth_data_source.dart';
-import 'package:meka/features/auth/data/models/user_model.dart';
 import 'package:meka/features/auth/domain/entities/user_entity.dart';
 
 import '../../domain/repositories/auth_repository.dart';
@@ -14,13 +13,13 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._authDataSource);
 
   @override
-  Future<Either<Failure, void>> appleLogin(SocialAuthParams params) {
-    return _authDataSource.appleLogin(params);
+  Future<Either<Failure, void>> appleLogin(NoParams noParams) {
+    return _authDataSource.appleLogin(noParams);
   }
 
   @override
-  Future<Either<Failure, void>> facebookLogin(SocialAuthParams params) {
-    return _authDataSource.facebookLogin(params);
+  Future<Either<Failure, void>> facebookLogin(NoParams noParams) {
+    return _authDataSource.facebookLogin(noParams);
   }
 
   @override
@@ -34,12 +33,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> googleLogin(SocialAuthParams params) {
-    return _authDataSource.googleLogin(params);
+  Future<Either<Failure, void>> googleLogin(NoParams noParams) {
+    return _authDataSource.googleLogin(noParams);
   }
 
   @override
-  Future<Either<Failure, UserModel>> login(LoginParams params) {
+  Future<Either<Failure, UserEntity>> login(LoginParams params) {
     return _authDataSource.login(params);
   }
 
@@ -49,7 +48,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> oTPVerify(OTPVerifyParams params) {
+  Future<Either<Failure, UserEntity>> oTPVerify(OTPVerifyParams params) {
     return _authDataSource.oTPVerify(params);
   }
 

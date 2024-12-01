@@ -9,7 +9,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:meka/core/extensions/color_extension.dart';
 import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/localization/locale_keys.g.dart';
-import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/stateful/custom_text_field.dart';
 import 'package:meka/core/stateless/custom_button.dart';
 import 'package:meka/core/stateless/gaps.dart';
@@ -138,7 +137,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     if (Platform.isIOS) ...[
                       InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            context.read<AuthBloc>().appleSignIn();
+                          },
                           child: SvgPicture.asset(
                             'assets/svg/apple.svg',
                             width: 60.w,
@@ -147,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                     InkWell(
                         onTap: () {
-                          context.read<AuthBloc>().googleSignIn(0, 'user');
+                          context.read<AuthBloc>().googleSignIn();
                         },
                         child: SvgPicture.asset(
                           'assets/svg/google.svg',
@@ -155,7 +156,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         )),
                     Gaps.h48(),
                     InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          context.read<AuthBloc>().facebookSignIn();
+                        },
                         child: SvgPicture.asset(
                           'assets/svg/facebook.svg',
                           width: 60.w,

@@ -7,24 +7,24 @@ import 'package:meka/core/network/failure/failure.dart';
 import 'package:meka/core/network/http/either.dart';
 
 abstract final class FirebaseApiConsumer {
-  Future<Either<Failure, User>> loginWithGoogle();
+  Future<Either<Failure, UserCredential>> loginWithGoogle();
 
-  Future<Either<Failure, User>> loginWithFacebook();
+  Future<Either<Failure, UserCredential>> loginWithFacebook();
 
-  Future<Either<Failure, User>> loginWithApple();
+  Future<Either<Failure, UserCredential>> loginWithApple();
 }
 
 final class BaseFirebaseApiConsumer implements FirebaseApiConsumer {
   BaseFirebaseApiConsumer();
 
   @override
-  Future<Either<Failure, User>> loginWithApple() {
+  Future<Either<Failure, UserCredential>> loginWithApple() {
     // TODO: implement loginWithApple
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<Failure, User>> loginWithFacebook() async {
+  Future<Either<Failure, UserCredential>> loginWithFacebook() async {
 
     log('llllllllllllllllllllllllllllllllllllllllllllll');
     // Trigger the sign-in flow
@@ -40,12 +40,12 @@ final class BaseFirebaseApiConsumer implements FirebaseApiConsumer {
     if (userCredential.user == null) {
       return Left(AuthFailure(message: 'Failed to sign in with Facebook'));
     } else {
-      return Right(userCredential.user!);
+      return Right(userCredential);
     }
   }
 
   @override
-  Future<Either<Failure, User>> loginWithGoogle() async {
+  Future<Either<Failure, UserCredential>> loginWithGoogle() async {
     try {
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -71,7 +71,7 @@ final class BaseFirebaseApiConsumer implements FirebaseApiConsumer {
           await FirebaseAuth.instance.signInWithCredential(credential);
 
       // Return the signed-in user's credentials
-      return Right(userCredential.user!);
+      return Right(userCredential);
     } catch (e) {
       return Left(AuthFailure(message: 'Failed to sign in with Google: $e'));
     }

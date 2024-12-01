@@ -15,6 +15,8 @@ import 'package:meka/core/stateless/custom_button.dart';
 import 'package:meka/core/stateless/gaps.dart';
 import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
+import 'package:meka/features/auth/presentation/blocs/auth/auth_state.dart';
+import 'package:meka/features/auth/presentation/views/otp_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -81,7 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Gaps.vertical(context.screenHeight * 0.001),
                   //phone
                   CustomTextField(
-                    hintText: LocaleKeys.password.tr(),
+                    hintText: LocaleKeys.phone.tr(),
                     // svgPath: 'assets/svg/lock.svg',
                     obscureText: false,
                     controller: _phoneController,
@@ -155,24 +157,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ],
                   ),
                   Gaps.vertical(context.screenHeight * 0.009),
-                  CustomElevatedButton(
-                    text: LocaleKeys.register.tr(),
-                    height: 90.h,
-                    width: context.screenWidth - 80.w,
-                    radius: 15,
-                    textStyle: context.theme.textTheme.bodyLarge!
-                        .copyWith(color: Colors.white),
-                    // color: AppCol,
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        context.read<AuthBloc>().register(
-                              _emailController.text.trim(),
-                              _passwordController.text.trim(),
-                              _nameController.text.trim(),
-                              _phoneController.text.trim(),
-                              isDriver ? 0 : 2,
-                            );
+                  BlocConsumer<AuthBloc, AuthState>(
+                    listener: (context, state) {
+                      if (state.isOTPSent) {
+                        context.go(const OTPScreen());
                       }
+                    },
+                    builder: (context, state) {
+                      return CustomElevatedButton(
+                        text: LocaleKeys.register.tr(),
+                        height: 90.h,
+                        width: context.screenWidth - 80.w,
+                        radius: 15,
+                        textStyle: context.theme.textTheme.bodyLarge!
+                            .copyWith(color: Colors.white),
+                        // color: AppCol,
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            context.read<AuthBloc>().register(
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                  _nameController.text.trim(),
+                                  _phoneController.text.trim(),
+                                  isDriver ? 0 : 2,
+                                );
+                          }
+                        },
+                      );
                     },
                   ),
                   Gaps.vertical(context.screenHeight * 0.01),
@@ -209,7 +220,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       children: [
                         if (Platform.isIOS) ...[
                           InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                context.read<AuthBloc>().appleSignIn();
+                              },
                               child: SvgPicture.asset(
                                 'assets/svg/apple.svg',
                                 width: 60.w,
@@ -218,7 +231,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ],
                         InkWell(
                             onTap: () {
-                              context.read<AuthBloc>().googleSignIn(0, 'admin');
+                              context.read<AuthBloc>().googleSignIn();
                             },
                             child: SvgPicture.asset(
                               'assets/svg/google.svg',
@@ -226,7 +239,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             )),
                         Gaps.h48(),
                         InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              context.read<AuthBloc>().facebookSignIn();
+                            },
                             child: SvgPicture.asset(
                               'assets/svg/facebook.svg',
                               width: 60.w,

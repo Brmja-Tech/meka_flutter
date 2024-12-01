@@ -67,10 +67,25 @@ class AuthBloc extends Cubit<AuthState> {
     );
   }
 
-  Future<void> register(String email, String password,String name,String phone,int  type) async {
+  Future<void> register(String email, String password, String name,
+      String phone, int type) async {
     emit(state.copyWith(status: AuthStatus.loading));
-    final result = await _registerUseCase(
-        RegisterParams(email: email, password: password,name: name,phone: phone,type: type));
+    final result = await _registerUseCase(RegisterParams(
+        email: email,
+        password: password,
+        name: name,
+        phone: phone,
+        type: type));
+    result.fold(
+      (l) => emit(
+          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+      (r) => emit(state.copyWith(status: AuthStatus.oTPSent)),
+    );
+  }
+
+  Future<void> googleSignIn() async {
+    emit(state.copyWith(status: AuthStatus.loading));
+    final result = await _googleSignInUseCase(const NoParams());
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
@@ -78,29 +93,71 @@ class AuthBloc extends Cubit<AuthState> {
     );
   }
 
-  Future<void> googleSignIn(int role, String type) async {
-    final token = await FirebaseMessaging.instance.getToken() ?? '';
-
+  Future<void> facebookSignIn() async {
     emit(state.copyWith(status: AuthStatus.loading));
-    // final result =
-    //     await _googleSignInUseCase(LoginParams(role: role, type: type, fcmToken: token));
-    // result.fold(
-    //   (l) => emit(
-    //       state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-    //   (r) => emit(state.copyWith(status: AuthStatus.success)),
-    // );
+    final result = await _facebookSignInUseCase(const NoParams());
+    result.fold(
+      (l) => emit(
+          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+      (r) => emit(state.copyWith(status: AuthStatus.success)),
+    );
   }
 
-  Future<void> facebookSignIn(int role, String type) async {
-    final token = await FirebaseMessaging.instance.getToken() ?? '';
-
+  Future<void> appleSignIn() async {
     emit(state.copyWith(status: AuthStatus.loading));
-    // final result =
-    //     await _facebookSignInUseCase(LoginParams(role: role, type: type, fcmToken: token));
-    // result.fold(
-    //   (l) => emit(
-    //       state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-    //   (r) => emit(state.copyWith(status: AuthStatus.success)),
-    // );
+    final result = await _appleSignInUseCase(const NoParams());
+    result.fold(
+      (l) => emit(
+          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+      (r) => emit(state.copyWith(status: AuthStatus.success)),
+    );
+  }
+
+  Future<void> forgotPassword(String email) async {
+    emit(state.copyWith(status: AuthStatus.loading));
+    final result =
+        await _forgotPasswordUseCase(ForgetPasswordParams(email: email));
+    result.fold(
+      (l) => emit(
+          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+      (r) => emit(state.copyWith(status: AuthStatus.success)),
+    );
+  }
+
+  Future<void> sendOTP(String email) async {
+    emit(state.copyWith(status: AuthStatus.loading));
+    final result = await _sendOTPUseCase(SendOTPParams(email: email));
+    result.fold(
+      (l) => emit(
+          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+      (r) => emit(state.copyWith(status: AuthStatus.success)),
+    );
+  }
+
+  Future<void> resetPassword(
+      {required String otp,
+      required String password,
+      required String passwordConfirm}) async {
+    emit(state.copyWith(status: AuthStatus.loading));
+    final result = await _resetPasswordUseCase(ResetPasswordParams(
+      otp: otp,
+      password: password,
+      passwordConfirm: passwordConfirm,
+    ));
+    result.fold(
+      (l) => emit(
+          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+      (r) => emit(state.copyWith(status: AuthStatus.success)),
+    );
+  }
+
+  Future<void> verifyOTP(String otp) async {
+    emit(state.copyWith(status: AuthStatus.loading));
+    final result = await _otpVerifyUseCase(OTPVerifyParams(otp: otp));
+    result.fold(
+      (l) => emit(
+          state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
+      (r) => emit(state.copyWith(status: AuthStatus.success)),
+    );
   }
 }
