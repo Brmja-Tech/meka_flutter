@@ -90,7 +90,7 @@ class AuthBloc extends Cubit<AuthState> {
   }
 
   Future<void> googleSignIn() async {
-    emit(state.copyWith(status: AuthStatus.loading));
+    // emit(state.copyWith(status: AuthStatus.loading));
     final result = await _googleSignInUseCase(const NoParams());
     result.fold(
       (l) => emit(
