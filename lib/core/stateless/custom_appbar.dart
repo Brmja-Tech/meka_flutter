@@ -22,9 +22,12 @@ class CustomAppbar extends StatelessWidget {
                     context.pop();
                   },
             child: Container(
+              // width: 70.w,
+              // height: 70.w,
               padding: EdgeInsets.all(5.w),
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(10),
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
@@ -37,10 +40,12 @@ class CustomAppbar extends StatelessWidget {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
+                padding:  EdgeInsets.all(15.0.w),
+                child: Transform.translate(
+                  offset: Offset(-5.w, 0.0.w),
                   child: Icon(
                     Icons.arrow_back_ios,
+                    size: 25,
                     color: AppColors.primaryColor,
                   ),
                 ),
