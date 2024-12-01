@@ -6,8 +6,14 @@ class CacheManager {
   // Save access token
   static Future<void> saveRole(bool role) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_roleKey, role);
+    final isSaved = await prefs.setBool(_roleKey, role);
+    if (isSaved) {
+      print('Role saved successfully: $role');
+    } else {
+      print('Failed to save role.');
+    }
   }
+
 
   static Future<bool?> getRole() async {
     final prefs = await SharedPreferences.getInstance();

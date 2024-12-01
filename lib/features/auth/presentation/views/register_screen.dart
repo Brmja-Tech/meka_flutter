@@ -196,7 +196,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   _passwordController.text.trim(),
                                   _nameController.text.trim(),
                                   _phoneController.text.trim(),
-                                  isDriver ? 0 : 2,
+                                  !isDriver ? 0 : 2,
                                 );
                           }
                         },

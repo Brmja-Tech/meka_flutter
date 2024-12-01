@@ -74,27 +74,27 @@ class _CarouselSliderWidgetState extends State<CarouselSliderWidget> {
           ),
         ),
 
-        // Dot Indicator
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(widget.widgets.length, (index) {
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                margin: const EdgeInsets.symmetric(horizontal: 5),
-                height: _currentPage == index ? 12 : 8, // Larger dot for current page
-                width: _currentPage == index ? 10 : 6, // Adjust size of active dot
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _currentPage == index
-                      ? Colors.blue // Active dot color
-                      : Colors.grey.withOpacity(0.2), // Inactive dot color
-                ),
-              );
-            }),
-          ),
-        ),
+        // // Dot Indicator
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(vertical: 10),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: List.generate(widget.widgets.length, (index) {
+        //       return AnimatedContainer(
+        //         duration: const Duration(milliseconds: 300),
+        //         margin: const EdgeInsets.symmetric(horizontal: 5),
+        //         height: _currentPage == index ? 12 : 8, // Larger dot for current page
+        //         width: _currentPage == index ? 10 : 6, // Adjust size of active dot
+        //         decoration: BoxDecoration(
+        //           shape: BoxShape.circle,
+        //           color: _currentPage == index
+        //               ? Colors.blue // Active dot color
+        //               : Colors.grey.withOpacity(0.2), // Inactive dot color
+        //         ),
+        //       );
+        //     }),
+        //   ),
+        // ),
       ],
     );
   }

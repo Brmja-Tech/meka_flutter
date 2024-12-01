@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -48,7 +50,9 @@ class _MekaScreenState extends State<MekaScreen> {
     });
   }
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index) async{
+    await CacheManager.getRole();
+    // log('role is ${await CacheManager.getRole()}');
     // CacheManager.clear();
     _pageController.jumpToPage(index);
     setState(() {
