@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => sl<UserBloc>()),
+        BlocProvider(create: (context) => sl<UserBloc>()..getUser()),
       ],
       child: ScreenUtilInit(
           designSize: const Size(750, 1334),

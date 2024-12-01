@@ -85,6 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   //phone
                   CustomTextField(
                     hintText: LocaleKeys.phone.tr(),
+                    maxLength: 11,
                     // svgPath: 'assets/svg/lock.svg',
                     obscureText: false,
                     controller: _phoneController,
@@ -125,6 +126,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ? TextAlign.start
                         : TextAlign.center,
                     textInputType: TextInputType.visiblePassword,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'confirm password is required';
+                      }
+                      if (value != _passwordController.text.trim()) {
+                        return 'password does not match';
+                      }
+                      return null;
+                    },
                   ),
                   ToggleButtons(
                     borderColor: Colors.grey,

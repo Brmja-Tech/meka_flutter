@@ -8,10 +8,13 @@ import 'package:meka/core/stateless/gaps.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
+  final String? Function(String?)? validator;
+  final String? errorText;
   final String hintText;
   final String? svgPath;
   final TextAlign? textAlign;
   final String? prefixPath;
+  final int? maxLength;
   final TextInputAction? textInputAction;
   final IconData? suffix;
   final int? minLines;
@@ -21,21 +24,25 @@ class CustomTextField extends StatelessWidget {
   final bool isLogin;
   final FocusNode? focusNode;
 
-  const CustomTextField(
-      {super.key,
-      required this.controller,
-      required this.hintText,
-      this.minLines = 1,
-      this.svgPath,
-      this.isLogin = false,
-      this.textInputAction = TextInputAction.next,
-      required this.obscureText,
-      this.textInputType = TextInputType.text,
-      this.textAlign,
-      this.prefixPath,
-      this.suffix,
-      this.focusNode,
-      this.maxLines = 1});
+  const CustomTextField({
+    super.key,
+    required this.controller,
+    required this.hintText,
+    this.minLines = 1,
+    this.svgPath,
+    this.maxLength,
+    this.isLogin = false,
+    this.textInputAction = TextInputAction.next,
+    required this.obscureText,
+    this.textInputType = TextInputType.text,
+    this.textAlign,
+    this.prefixPath,
+    this.suffix,
+    this.focusNode,
+    this.maxLines = 1,
+    this.errorText,
+    this.validator,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +54,13 @@ class CustomTextField extends StatelessWidget {
             ? BoxConstraints(minHeight: 50.h, maxHeight: 120.h)
             : const BoxConstraints(),
         child: TextFormField(
+          maxLength: maxLength,
           textAlign: textAlign ?? TextAlign.start,
           obscureText: obscureText,
           keyboardType: textInputType,
           minLines: minLines,
+          textDirection:
+              context.isArabic ? TextDirection.rtl : TextDirection.ltr,
           maxLines: maxLines,
           textInputAction: textInputAction,
           inputFormatters: [
@@ -62,6 +72,7 @@ class CustomTextField extends StatelessWidget {
           decoration: InputDecoration(
             fillColor: HexColor.fromHex('#FAFAFA'),
             filled: true,
+            counterText: "",
             contentPadding:
                 EdgeInsets.all(30.w).add(EdgeInsets.symmetric(vertical: 5.h)),
             border: const OutlineInputBorder(
@@ -98,9 +109,9 @@ class CustomTextField extends StatelessWidget {
                     ),
                   ),
           ),
-          validator: (value) {
+          validator: validator ?? (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter some text';
+              return errorText ?? 'This field is required';
             }
             return null;
           },

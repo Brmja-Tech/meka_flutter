@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meka/core/network/base_use_case/base_use_case.dart';
+import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/features/auth/data/datasources/auth_data_source.dart';
 import 'package:meka/features/auth/domain/usecases/get_user_profile_use_case.dart';
 import 'package:meka/features/auth/domain/usecases/update_profile_use_case.dart';
@@ -15,6 +16,7 @@ class UserBloc extends Cubit<UserState> {
   static UserBloc get to => navigatorKey.currentContext!.read<UserBloc>();
 
   Future<void> getUser() async {
+    if(await CacheManager.getAccessToken() == null) return;
     emit(state.copyWith(status: UserStatus.loading));
     final result = await _getProfileUseCase(const NoParams());
     result.fold(

@@ -150,7 +150,7 @@ class AuthDataSourceImpl implements AuthDataSource {
     final result =
         await _apiConsumer.post(EndPoints.verifyOTP, data: params.toJson());
     return result.fold(
-        (l) => Left(l), (r) => Right(UserModel.fromJson(r['data'])));
+        (l) => Left(l), (r) => Right(UserModel.fromJson(r['data']['user'])));
   }
 
   @override

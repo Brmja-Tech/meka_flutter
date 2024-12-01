@@ -79,7 +79,9 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   Gaps.vertical(context.screenHeight * 0.1),
                   Text(LocaleKeys.enterCode.tr()),
                   Gaps.vertical(context.screenHeight * 0.05),
-                  const OTPWidget(),
+                  OTPWidget(
+                    onDone: (otp) async {},
+                  ),
                   Gaps.vertical(context.screenHeight * 0.05),
                   CustomElevatedButton(
                       width: context.screenWidth - 150.w,

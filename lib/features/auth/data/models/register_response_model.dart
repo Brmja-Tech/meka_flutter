@@ -9,6 +9,6 @@ class RegisterResponseModel extends RegisterResponseEntity {
     return RegisterResponseModel(
         user: UserModel.fromJson(json['user']),
         token: json['token'],
-        otp: json['otp']);
-  }
+        otp: json['otp'] is int ? json['otp'] : int.tryParse(json['otp'].toString()) ?? 0,
+    );}
 }

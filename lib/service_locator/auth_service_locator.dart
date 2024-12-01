@@ -35,7 +35,7 @@ class AuthServiceLocator {
     sl.registerFactory(() => SendOTPUseCase(sl()));
     sl.registerFactory(() => GetProfileUseCase(sl()));
     sl.registerFactory(() => UpdateProfileUseCase(sl()));
-    sl.registerFactory(() =>
+    sl.registerLazySingleton(() =>
         AuthBloc(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()));
     sl.registerLazySingleton<UserBloc>(() => UserBloc(sl(), sl()));
   }

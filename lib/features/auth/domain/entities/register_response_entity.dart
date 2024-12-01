@@ -4,7 +4,7 @@ import 'package:meka/features/auth/domain/entities/user_entity.dart';
 class RegisterResponseEntity extends Equatable{
   final UserEntity user;
   final String token;
-  final String otp;
+  final int otp;
 
   const RegisterResponseEntity({required this.user, required this.token, required this.otp});
 

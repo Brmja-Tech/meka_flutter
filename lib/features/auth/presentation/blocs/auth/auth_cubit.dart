@@ -81,7 +81,11 @@ class AuthBloc extends Cubit<AuthState> {
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.oTPSent,registerResponseEntity: r)),
+      (r) {
+
+        emit(state.copyWith(
+            status: AuthStatus.oTPSent, registerResponseEntity: r,user: r.user));
+      },
     );
   }
 
@@ -126,13 +130,13 @@ class AuthBloc extends Cubit<AuthState> {
     );
   }
 
-  Future<void> sendOTP(String email) async {
+  Future<void> reSendOTP(String email) async {
     emit(state.copyWith(status: AuthStatus.loading));
     final result = await _sendOTPUseCase(SendOTPParams(email: email));
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.success)),
+      (r) => emit(state.copyWith(status: AuthStatus.otPResent)),
     );
   }
 
@@ -159,7 +163,7 @@ class AuthBloc extends Cubit<AuthState> {
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.success)),
+      (r) => emit(state.copyWith(status: AuthStatus.verified)),
     );
   }
 }

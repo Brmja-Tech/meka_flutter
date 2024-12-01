@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/theme/app_colors.dart';
+import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
 import 'package:meka/features/auth/presentation/views/reset_password_screen.dart';
 
 class OTPWidget extends StatefulWidget {
-  const OTPWidget({super.key});
+  final bool forgetPassword;
+  final Future<void> Function(String otp) onDone;
+
+  const OTPWidget(
+      {super.key, this.forgetPassword = true, required this.onDone});
 
   @override
   _OTPWidgetState createState() => _OTPWidgetState();
@@ -35,14 +41,27 @@ class _OTPWidgetState extends State<OTPWidget> {
     super.dispose();
   }
 
-  void handleInput(String value, int index) {
+
+  void handleInput(String value, int index) async {
     if (value.isNotEmpty && index < otpLength - 1) {
       FocusScope.of(context).requestFocus(focusNodes[index + 1]);
     } else if (value.isEmpty && index > 0) {
       FocusScope.of(context).requestFocus(focusNodes[index - 1]);
     }
-    if(index==3){
-      context.go(const ResetPasswordScreen());
+
+    // Check if OTP is complete
+    final otp = controllers.map((controller) => controller.text).join();
+    if (otp.length == otpLength) {
+      try {
+        await widget.onDone(otp); // Trigger API request
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('OTP verified successfully!')),
+        );
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to verify OTP: $error')),
+        );
+      }
     }
   }
 
@@ -61,10 +80,8 @@ class _OTPWidgetState extends State<OTPWidget> {
               focusNode: focusNodes[index],
               maxLength: 1,
               textInputAction: TextInputAction.next,
-              inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly
-              ],
-              style:  TextStyle(
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              style: TextStyle(
                 fontWeight: FontWeight.bold, // Make the font bold
                 fontSize: 40.sp, // Optional: Increase font size
               ),
@@ -81,14 +98,14 @@ class _OTPWidgetState extends State<OTPWidget> {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide:  BorderSide(
+                  borderSide: BorderSide(
                     color: AppColors.primaryColor, // Default border color
                     width: 2,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide:  BorderSide(
+                  borderSide: BorderSide(
                     color: AppColors.primaryColor, // Border color when focused
                     width: 2,
                   ),

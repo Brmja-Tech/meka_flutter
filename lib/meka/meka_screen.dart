@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:meka/core/network/cache_helper/cache_manager.dart';
+import 'package:meka/core/network/http/api_consumer.dart';
+import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/chat/presentation/views/chat_screen.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
 import 'package:meka/features/offers/presentation/views/offers_screen.dart';
 import 'package:meka/features/profile/presentation/views/profile_screen.dart';
 import 'package:meka/meka/home_screen.dart';
+import 'package:meka/service_locator/service_locator.dart';
+
+import '../features/auth/presentation/blocs/auth/auth_cubit.dart';
 
 class MekaScreen extends StatefulWidget {
   const MekaScreen({super.key});
@@ -15,6 +22,14 @@ class MekaScreen extends StatefulWidget {
 }
 
 class _MekaScreenState extends State<MekaScreen> {
+  @override
+  Future<void> didChangeDependencies() async {
+    await context.read<UserBloc>().getUser();
+    sl<ApiConsumer>().updateHeader(
+        {"Authorization": ' Bearer ${await CacheManager.getAccessToken()}'});
+    super.didChangeDependencies();
+  }
+
   final PageController _pageController = PageController();
 
   int _selectedIndex = 0;
@@ -24,7 +39,7 @@ class _MekaScreenState extends State<MekaScreen> {
     const MapsScreen(),
     const HomeScreen(),
     const ChatScreen(),
-    const ProfilePage(),
+    BlocProvider(create: (_) => sl<AuthBloc>(), child: const ProfilePage()),
   ];
 
   void _onPageChanged(int index) {
@@ -34,6 +49,7 @@ class _MekaScreenState extends State<MekaScreen> {
   }
 
   void _onItemTapped(int index) {
+    // CacheManager.clear();
     _pageController.jumpToPage(index);
     setState(() {
       _selectedIndex = index;
