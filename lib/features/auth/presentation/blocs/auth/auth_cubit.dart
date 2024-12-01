@@ -95,7 +95,7 @@ class AuthBloc extends Cubit<AuthState> {
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.success)),
+      (r) => emit(state.copyWith(status: AuthStatus.socialAuthSuccess)),
     );
   }
 

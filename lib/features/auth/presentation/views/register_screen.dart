@@ -17,6 +17,7 @@ import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:meka/features/auth/presentation/views/otp_screen.dart';
+import 'package:meka/meka/meka_screen.dart';
 import 'package:meka/service_locator/service_locator.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -110,7 +111,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     prefixPath: 'assets/svg/lock.svg',
                     controller: _passwordController,
                     textAlign: TextAlign.start,
-
                     textInputType: TextInputType.visiblePassword,
                   ),
                   Gaps.vertical(context.screenHeight * 0.001),
@@ -133,6 +133,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
+                  Gaps.v48(),
                   ToggleButtons(
                     borderColor: Colors.grey,
                     fillColor: AppColors.primaryColor,
@@ -164,9 +165,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ],
                   ),
-                  Gaps.vertical(context.screenHeight * 0.009),
+                  Gaps.v48(),
+
                   BlocConsumer<AuthBloc, AuthState>(
                     listener: (context, state) {
+                      if (state.isSocialAuthSuccess) {
+                        context.goWithNoReturn(const MekaScreen());
+                      }
                       if (state.isOTPSent) {
                         context.go(BlocProvider.value(
                           value: sl<AuthBloc>(),
@@ -266,6 +271,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ],
                     ),
                   ),
+                  Gaps.v48(),
                 ],
               ),
             ),

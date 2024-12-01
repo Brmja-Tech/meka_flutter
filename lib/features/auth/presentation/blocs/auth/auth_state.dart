@@ -2,7 +2,17 @@ import 'package:equatable/equatable.dart';
 import 'package:meka/features/auth/domain/entities/register_response_entity.dart';
 import 'package:meka/features/auth/domain/entities/user_entity.dart';
 
-enum AuthStatus { loading,isRequestingOTP, initial, success, failure, oTPSent,otPResent,verified }
+enum AuthStatus {
+  loading,
+  isRequestingOTP,
+  initial,
+  success,
+  failure,
+  oTPSent,
+  otPResent,
+  verified,
+  socialAuthSuccess
+}
 
 extension AuthStatusX on AuthState {
   bool get isInitial => status == AuthStatus.initial;
@@ -18,6 +28,9 @@ extension AuthStatusX on AuthState {
   bool get isVerified => status == AuthStatus.verified;
 
   bool get isOTPResent => status == AuthStatus.otPResent;
+
+  bool get isSocialAuthSuccess => status == AuthStatus.socialAuthSuccess;
+
   bool get isRequestingOTP => status == AuthStatus.isRequestingOTP;
 }
 

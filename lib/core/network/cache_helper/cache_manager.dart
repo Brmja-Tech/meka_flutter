@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CacheManager {
@@ -8,9 +10,9 @@ class CacheManager {
     final prefs = await SharedPreferences.getInstance();
     final isSaved = await prefs.setBool(_roleKey, role);
     if (isSaved) {
-      print('Role saved successfully: $role');
+      log('Role saved successfully: $role');
     } else {
-      print('Failed to save role.');
+      log('Failed to save role.');
     }
   }
 
