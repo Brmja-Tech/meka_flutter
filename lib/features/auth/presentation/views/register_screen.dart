@@ -172,6 +172,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           value: sl<AuthBloc>(),
                           child: OTPScreen(
                             otp: state.registerResponseEntity!.otp,
+                            email: _emailController.text.trim(),
                           ),
                         ));
                       }

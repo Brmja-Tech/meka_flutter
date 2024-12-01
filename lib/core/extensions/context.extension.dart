@@ -5,18 +5,29 @@ import '../helper/functions.dart';
 
 extension ContextExtensions on BuildContext {
   double get screenHeight => MediaQuery.of(this).size.height;
+
   double get screenWidth => MediaQuery.of(this).size.width;
+
   ThemeData get theme => Theme.of(this);
+
   TextTheme get textTheme => Theme.of(this).textTheme;
+
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
+
   bool get isArabic => Localizations.localeOf(this).languageCode == 'ar';
+
   TextDirection get textDirection =>
       isArabic ? TextDirection.rtl : TextDirection.ltr;
+
   FocusScopeNode get foucsScopeNode => FocusScope.of(this);
+
   goWithNoReturn(Widget widget, {String? routeName}) =>
       navToAndRemoveUntil(this, widget, routeName: routeName);
 
   go(Widget widget, {String? routeName}) => navTo(this, widget, routeName);
+
+  goWithReplacement(Widget widget, {String? routeName}) =>
+      navWithReplacement(this, widget, routeName: routeName);
 
   pop([Object? object]) => Navigator.of(this).pop(object);
 
@@ -33,7 +44,6 @@ extension ContextExtensions on BuildContext {
             Expanded(
               child: Text(
                 message,
-
                 style: theme.textTheme.bodyLarge!.copyWith(color: Colors.black),
                 textAlign: TextAlign.center,
               ),
@@ -54,10 +64,10 @@ extension ContextExtensions on BuildContext {
   }
 
   void showSuccessMessage(
-      String message, {
-        Color color = Colors.green,
-        IconData icon = Icons.check_circle,
-      }) {
+    String message, {
+    Color color = Colors.green,
+    IconData icon = Icons.check_circle,
+  }) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ScaffoldMessenger.of(this).showSnackBar(
         SnackBar(
@@ -69,8 +79,10 @@ extension ContextExtensions on BuildContext {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text(message,
-                  style:theme.textTheme.bodyLarge!.copyWith(color: Colors.black),
+                child: Text(
+                  message,
+                  style:
+                      theme.textTheme.bodyLarge!.copyWith(color: Colors.black),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -96,7 +108,6 @@ extension ContextExtensions on BuildContext {
         ),
         content: Text(
           text,
-
           style: theme.textTheme.bodyLarge!.copyWith(color: Colors.black),
           textAlign: TextAlign.center,
         ),
@@ -107,7 +118,7 @@ extension ContextExtensions on BuildContext {
 
   void showLoadingDialog({
     String? message,
-    bool canPop =false,
+    bool canPop = false,
     bool barrierDismissible = false,
   }) {
     showDialog(
@@ -124,7 +135,6 @@ extension ContextExtensions on BuildContext {
             children: [
               const CircularProgressIndicator.adaptive(),
               Gaps.v18(),
-
               Text(
                 message ?? '...تحميل البيانات',
                 style: theme.textTheme.titleLarge!,
@@ -136,5 +146,5 @@ extension ContextExtensions on BuildContext {
         ),
       ),
     );
- }
+  }
 }

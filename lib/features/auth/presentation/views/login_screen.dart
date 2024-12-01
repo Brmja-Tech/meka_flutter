@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              context.go(const ForgetPasswordScreen());
+                              context.go(BlocProvider(create: (context)=> sl<AuthBloc>(), child: const ForgetPasswordScreen()));
                             },
                         ),
                       ],

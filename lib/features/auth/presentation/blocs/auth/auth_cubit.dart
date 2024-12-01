@@ -69,7 +69,7 @@ class AuthBloc extends Cubit<AuthState> {
 
   Future<void> register(String email, String password, String name,
       String phone, int type) async {
-    emit(state.copyWith(status: AuthStatus.loading));
+    emit(state.copyWith(status: AuthStatus.loading,registerResponseEntity: null));
     final fcmToken = await FirebaseMessaging.instance.getToken() ?? '';
     final result = await _registerUseCase(RegisterParams(
         email: email,
@@ -120,13 +120,13 @@ class AuthBloc extends Cubit<AuthState> {
   }
 
   Future<void> forgotPassword(String email) async {
-    emit(state.copyWith(status: AuthStatus.loading));
+    emit(state.copyWith(status: AuthStatus.isRequestingOTP,registerResponseEntity: null));
     final result =
         await _forgotPasswordUseCase(ForgetPasswordParams(email: email));
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.success)),
+      (r) => emit(state.copyWith(status: AuthStatus.oTPSent,registerResponseEntity: r)),
     );
   }
 
@@ -136,7 +136,7 @@ class AuthBloc extends Cubit<AuthState> {
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.otPResent)),
+      (r) => emit(state.copyWith(status: AuthStatus.otPResent,registerResponseEntity: r)),
     );
   }
 

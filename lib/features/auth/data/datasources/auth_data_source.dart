@@ -12,13 +12,15 @@ import 'package:meka/features/auth/data/models/register_response_model.dart';
 import 'package:meka/features/auth/data/models/user_model.dart';
 import 'package:meka/features/auth/domain/entities/register_response_entity.dart';
 import 'package:meka/features/auth/domain/entities/user_entity.dart';
+import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 
 abstract class AuthDataSource {
-  Future<Either<Failure, RegisterResponseEntity>> register(RegisterParams params);
+  Future<Either<Failure, RegisterResponseEntity>> register(
+      RegisterParams params);
 
   Future<Either<Failure, UserEntity>> oTPVerify(OTPVerifyParams params);
 
-  Future<Either<Failure, void>> sendOTP(SendOTPParams params);
+  Future<Either<Failure, RegisterResponseEntity>> sendOTP(SendOTPParams params);
 
   Future<Either<Failure, UserEntity>> login(LoginParams params);
 
@@ -28,7 +30,8 @@ abstract class AuthDataSource {
 
   Future<Either<Failure, void>> appleLogin(NoParams noParams);
 
-  Future<Either<Failure, void>> forgetPassword(ForgetPasswordParams params);
+  Future<Either<Failure, RegisterResponseEntity>> forgetPassword(
+      ForgetPasswordParams params);
 
   Future<Either<Failure, void>> resetPassword(ResetPasswordParams params);
 
@@ -62,10 +65,11 @@ class AuthDataSourceImpl implements AuthDataSource {
   }
 
   @override
-  Future<Either<Failure, RegisterResponseEntity>> register(RegisterParams params) async {
+  Future<Either<Failure, RegisterResponseEntity>> register(
+      RegisterParams params) async {
     final result =
         await _apiConsumer.post(EndPoints.register, data: params.toJson());
-    return result.fold((l) => Left(l), (r) async{
+    return result.fold((l) => Left(l), (r) async {
       await CacheManager.saveAccessToken(r['data']['token']);
       _apiConsumer
           .updateHeader({"Authorization": ' Bearer ${r['data']['token']}'});
@@ -76,9 +80,21 @@ class AuthDataSourceImpl implements AuthDataSource {
 
   @override
   Future<Either<Failure, void>> logout(NoParams params) async {
+    final user = UserBloc.to.state.user!.userType;
+    if (user == 'google') {
+      _firebaseApiConsumer.googleSignOut();
+    } else if (user == 'facebook') {
+      _firebaseApiConsumer.facebookSignOut();
+    } else if (user == 'apple') {
+      _firebaseApiConsumer.appleSignOut();
+    }
+
     final result = await _apiConsumer.post(EndPoints.logout);
-    return result.fold((l) => Left(l), (r) {
-      CacheManager.clear();
+    return result.fold((l) => Left(l), (r) async {
+      await CacheManager.clear();
+      log('token is ${await CacheManager.getAccessToken()}');
+      _apiConsumer.updateHeader(
+          {'Authorization': 'Bearer ${await CacheManager.getAccessToken()}'});
       return Right(null);
     });
   }
@@ -117,24 +133,33 @@ class AuthDataSourceImpl implements AuthDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> resetPassword(ResetPasswordParams params) {
-    // TODO: implement resetPassword
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<Failure, void>> sendOTP(SendOTPParams params) async {
+  Future<Either<Failure, void>> resetPassword(
+      ResetPasswordParams params) async {
     final result =
-        await _apiConsumer.post(EndPoints.sendOTP, data: params.toJson());
+        await _apiConsumer.post(EndPoints.resetPassword, data: params.toJson());
     return result.fold((l) => Left(l), (r) => Right(null));
   }
 
   @override
-  Future<Either<Failure, void>> forgetPassword(
+  Future<Either<Failure, RegisterResponseEntity>> sendOTP(
+      SendOTPParams params) async {
+    final result =
+        await _apiConsumer.post(EndPoints.sendOTP, data: params.toJson());
+    return result.fold((l) => Left(l), (r) async {
+      await CacheManager.saveAccessToken(r['data']['token']);
+      return Right(RegisterResponseModel.fromJson(r['data']));
+    });
+  }
+
+  @override
+  Future<Either<Failure, RegisterResponseEntity>> forgetPassword(
       ForgetPasswordParams params) async {
     final result = await _apiConsumer.post(EndPoints.forgetPassword,
         data: params.toJson());
-    return result.fold((l) => Left(l), (r) => Right(null));
+    return result.fold((l) => Left(l), (r) async {
+      await CacheManager.saveAccessToken(r['data']['token']);
+      return Right(RegisterResponseModel.fromJson(r['data']));
+    });
   }
 
   @override

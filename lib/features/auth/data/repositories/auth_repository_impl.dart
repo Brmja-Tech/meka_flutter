@@ -24,7 +24,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> forgetPassword(ForgetPasswordParams params) {
+  Future<Either<Failure, RegisterResponseEntity>> forgetPassword(ForgetPasswordParams params) {
     return _authDataSource.forgetPassword(params);
   }
 
@@ -64,7 +64,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> sendOTP(SendOTPParams params) {
+  Future<Either<Failure, RegisterResponseEntity>> sendOTP(SendOTPParams params) {
     return _authDataSource.sendOTP(params);
   }
 

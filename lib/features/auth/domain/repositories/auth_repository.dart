@@ -10,7 +10,7 @@ abstract class AuthRepository {
 
   Future<Either<Failure, UserEntity>> oTPVerify(OTPVerifyParams params);
 
-  Future<Either<Failure, void>> sendOTP(SendOTPParams params);
+  Future<Either<Failure, RegisterResponseEntity>> sendOTP(SendOTPParams params);
 
   Future<Either<Failure, UserEntity>> login(LoginParams params);
 
@@ -20,7 +20,7 @@ abstract class AuthRepository {
 
   Future<Either<Failure, void>> appleLogin(NoParams noParams);
 
-  Future<Either<Failure, void>> forgetPassword(ForgetPasswordParams params);
+  Future<Either<Failure, RegisterResponseEntity>> forgetPassword(ForgetPasswordParams params);
 
   Future<Either<Failure, void>> resetPassword(ResetPasswordParams params);
 

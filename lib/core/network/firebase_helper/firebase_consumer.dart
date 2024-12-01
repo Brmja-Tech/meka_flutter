@@ -9,9 +9,15 @@ import 'package:meka/core/network/http/either.dart';
 abstract final class FirebaseApiConsumer {
   Future<Either<Failure, UserCredential>> loginWithGoogle();
 
+  Future<Either<Failure, void>> googleSignOut();
+
   Future<Either<Failure, UserCredential>> loginWithFacebook();
 
+  Future<Either<Failure, void>> facebookSignOut();
+
   Future<Either<Failure, UserCredential>> loginWithApple();
+
+  Future<Either<Failure, void>> appleSignOut();
 }
 
 final class BaseFirebaseApiConsumer implements FirebaseApiConsumer {
@@ -25,7 +31,6 @@ final class BaseFirebaseApiConsumer implements FirebaseApiConsumer {
 
   @override
   Future<Either<Failure, UserCredential>> loginWithFacebook() async {
-
     log('llllllllllllllllllllllllllllllllllllllllllllll');
     // Trigger the sign-in flow
     final LoginResult loginResult = await FacebookAuth.instance.login();
@@ -74,6 +79,36 @@ final class BaseFirebaseApiConsumer implements FirebaseApiConsumer {
       return Right(userCredential);
     } catch (e) {
       return Left(AuthFailure(message: 'Failed to sign in with Google: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> appleSignOut() async {
+    try {
+      await GoogleSignIn().signOut();
+      return Right(null);
+    } catch (e) {
+      return Left(AuthFailure(message: 'Failed to sign out with Google: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> facebookSignOut() async {
+    try {
+      await FacebookAuth.instance.logOut();
+      return Right(null);
+    } catch (e) {
+      return Left(AuthFailure(message: 'Failed to sign out with Facebook: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> googleSignOut() async {
+    try {
+      await GoogleSignIn().signOut();
+      return Right(null);
+    } catch (e) {
+      return Left(AuthFailure(message: 'Failed to sign out with Google: $e'));
     }
   }
 }
