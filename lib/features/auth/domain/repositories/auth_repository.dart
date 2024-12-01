@@ -2,10 +2,11 @@ import 'package:meka/core/network/base_use_case/base_use_case.dart';
 import 'package:meka/core/network/failure/failure.dart';
 import 'package:meka/core/network/http/either.dart';
 import 'package:meka/features/auth/data/datasources/auth_data_source.dart';
+import 'package:meka/features/auth/domain/entities/register_response_entity.dart';
 import 'package:meka/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthRepository {
-  Future<Either<Failure, void>> register(RegisterParams params);
+  Future<Either<Failure, RegisterResponseEntity>> register(RegisterParams params);
 
   Future<Either<Failure, UserEntity>> oTPVerify(OTPVerifyParams params);
 

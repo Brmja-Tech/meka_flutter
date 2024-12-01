@@ -22,4 +22,9 @@ sealed class EndPoints {
   static String sendMessage(String id) => 'chats/$id/replies';
 
   static String getMessages(String id) => 'chats/$id/replies';
+
+  //products
+  static const String getProducts = 'products';
+  static const String getOffers = 'offers';
+  static const String getBanners = 'banners';
 }

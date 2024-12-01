@@ -357,7 +357,7 @@ final class BaseApiConsumer implements ApiConsumer {
     switch (error.type) {
       case DioExceptionType.cancel:
         navigatorKey.currentContext!.showErrorMessage('تم الغاء الطلب ');
-        return ServerFailure(message: 'تم إلغاء الطلب  ');
+        return ServerFailure(message: 'تم إلغاء الطلب ');
       case DioExceptionType.connectionTimeout:
         navigatorKey.currentContext!.showErrorMessage('انتهت مهلة الاتصال ');
         return ServerFailure(message: 'انتهت مهلة الاتصال ');
@@ -368,46 +368,63 @@ final class BaseApiConsumer implements ApiConsumer {
         navigatorKey.currentContext!.showErrorMessage('انتهت مهلة الاتصال ');
         return ServerFailure(message: 'انتهت مهلة الإرسال في الاتصال ');
       case DioExceptionType.badResponse:
-        if (error.response?.data != null) {
+        if (error.response?.statusCode == 401) {
+          // Unauthorized request
+          final String? message = error.response?.data['message'];
+          navigatorKey.currentContext!
+              .showErrorMessage(message ?? 'غير مصرح لك بالوصول');
+          return UnauthorizedFailure(
+            message: message ?? 'غير مصرح لك بالوصول',
+          );
+        } else if (error.response?.data != null) {
+          // Handle other types of errors (e.g., validation, server errors)
           try {
             final data = error.response!.data;
             final Map<String, dynamic> decoded =
-                data is String ? json.decode(data) : data;
+            data is String ? json.decode(data) : data;
 
             if (decoded.containsKey('message')) {
               String message = decoded['message'];
-              List<String> errors = decoded['errors'] != null
-                  ? List<String>.from(decoded['errors'])
-                  : [];
-              loggerError(message);
-              if (errors.isNotEmpty) {
-                navigatorKey.currentContext!.showErrorMessage(errors[0]);
 
-                return ValidationFailure(
-                  message: message,
-                  errors: errors,
-                );
+              // Process validation errors if present
+              if (decoded.containsKey('errors')) {
+                final Map<String, dynamic> errors = decoded['errors'];
+                List<String> errorMessages = [];
+                errors.forEach((key, value) {
+                  if (value is List) {
+                    errorMessages.addAll(value.map((e) => '$e').toList());
+                  } else if (value is String) {
+                    errorMessages.add(value);
+                  }
+                });
+
+                if (errorMessages.isNotEmpty) {
+                  navigatorKey.currentContext!.showErrorMessage(errorMessages[0]);
+                  return ValidationFailure(
+                    message: message,
+                    errors: errorMessages,
+                  );
+                }
               }
+
+              navigatorKey.currentContext!.showErrorMessage(message);
               return ServerFailure(message: message);
             }
           } catch (e) {
             navigatorKey.currentContext!.showErrorMessage(e.toString());
-
             return ServerFailure(
                 message:
-                    'Received invalid status code: ${error.response?.statusCode}');
+                'Received invalid status code: ${error.response?.statusCode}');
           }
         }
         navigatorKey.currentContext!.showErrorMessage(error.message!);
-
         return ServerFailure(
             message:
-                'Received invalid status code: ${error.response?.statusCode}');
+            'Received invalid status code: ${error.response?.statusCode}');
       case DioExceptionType.badCertificate:
         return ServerFailure(message: 'تعذر الاتصال ');
       case DioExceptionType.connectionError:
         navigatorKey.currentContext!.showErrorMessage('تعذر الاتصال ');
-
         return NetworkFailure(message: 'تعذر الاتصال ');
       case DioExceptionType.unknown:
       default:

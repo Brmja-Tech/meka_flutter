@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,10 +10,12 @@ import 'package:meka/core/stateless/custom_button.dart';
 import 'package:meka/core/stateless/gaps.dart';
 
 class OTPScreen extends StatelessWidget {
-  const OTPScreen({super.key});
+  final String otp;
+  const OTPScreen({super.key, required this.otp});
 
   @override
   Widget build(BuildContext context) {
+    log('otp is $otp');
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(

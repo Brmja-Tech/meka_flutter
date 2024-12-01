@@ -70,16 +70,18 @@ class AuthBloc extends Cubit<AuthState> {
   Future<void> register(String email, String password, String name,
       String phone, int type) async {
     emit(state.copyWith(status: AuthStatus.loading));
+    final fcmToken = await FirebaseMessaging.instance.getToken() ?? '';
     final result = await _registerUseCase(RegisterParams(
         email: email,
         password: password,
         name: name,
         phone: phone,
+        fcmToken: fcmToken,
         type: type));
     result.fold(
       (l) => emit(
           state.copyWith(status: AuthStatus.failure, errorMessage: l.message)),
-      (r) => emit(state.copyWith(status: AuthStatus.oTPSent)),
+      (r) => emit(state.copyWith(status: AuthStatus.oTPSent,registerResponseEntity: r)),
     );
   }
 

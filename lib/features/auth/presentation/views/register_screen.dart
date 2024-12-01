@@ -17,6 +17,7 @@ import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_state.dart';
 import 'package:meka/features/auth/presentation/views/otp_screen.dart';
+import 'package:meka/service_locator/service_locator.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -160,10 +161,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   BlocConsumer<AuthBloc, AuthState>(
                     listener: (context, state) {
                       if (state.isOTPSent) {
-                        context.go(const OTPScreen());
+                        context.go(BlocProvider.value(
+                          value: sl<AuthBloc>(),
+                          child: OTPScreen(
+                            otp: state.registerResponseEntity!.otp,
+                          ),
+                        ));
                       }
                     },
                     builder: (context, state) {
+                      if (state.isLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
                       return CustomElevatedButton(
                         text: LocaleKeys.register.tr(),
                         height: 90.h,

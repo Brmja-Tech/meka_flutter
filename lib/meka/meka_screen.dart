@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:meka/core/network/cache_helper/cache_manager.dart';
-import 'package:meka/core/network/http/api_consumer.dart';
-import 'package:meka/core/theme/app_colors.dart';
-import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
-import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/chat/presentation/views/chat_screen.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
 import 'package:meka/features/offers/presentation/views/offers_screen.dart';
 import 'package:meka/features/profile/presentation/views/profile_screen.dart';
-import 'package:meka/service_locator/service_locator.dart';
+import 'package:meka/meka/home_screen.dart';
 
 class MekaScreen extends StatefulWidget {
   const MekaScreen({super.key});
@@ -21,17 +15,26 @@ class MekaScreen extends StatefulWidget {
 }
 
 class _MekaScreenState extends State<MekaScreen> {
+  final PageController _pageController = PageController();
+
   int _selectedIndex = 0;
 
-  // Pages for IndexedStack
   final List<Widget> _pages = [
     const OfferScreen(),
     const MapsScreen(),
+    const HomeScreen(),
     const ChatScreen(),
-    BlocProvider(create: (_) => sl<AuthBloc>(), child: const ProfilePage()),
+    const ProfilePage(),
   ];
 
+  void _onPageChanged(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   void _onItemTapped(int index) {
+    _pageController.jumpToPage(index);
     setState(() {
       _selectedIndex = index;
     });
@@ -40,102 +43,67 @@ class _MekaScreenState extends State<MekaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
-      bottomNavigationBar: Stack(
+      body: Stack(
         children: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-
-            // Horizontal padding
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30), // Rounded corners
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26, // Shadow color
-                  blurRadius: 10, // Shadow blur
-                  offset: Offset(0, 4), // Shadow position
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              // Ensure the shadow matches border radius
-              child: Theme(
-                data: ThemeData(
-                  splashColor: Colors.transparent,
-                  // highlightColor: Colors.transparent,
-                ),
-                child: BottomNavigationBar(
-                  elevation: 0,
-                  // Remove elevation
-                  backgroundColor: Colors.white,
-                  // Background color of the bar
-                  currentIndex: _selectedIndex,
-                  onTap: _onItemTapped,
-
-                  showSelectedLabels: false,
-                  // Hide labels for selected items
-                  showUnselectedLabels: false,
-                  // Hide labels for unselected items
-                  type: BottomNavigationBarType.fixed,
-                  // Keep shifting type
-                  selectedItemColor: AppColors.primaryColor,
-                  // Icon color for selected item
-                  unselectedItemColor: Colors.grey,
-                  // Icon color for unselected items
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: SvgPicture.asset(
-                        'assets/svg/lock.svg',
-                      ),
-                      label: '',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Padding(
-                        padding: EdgeInsetsDirectional.only(end: 60.w),
-                        child: SvgPicture.asset('assets/svg/search.svg'),
-                      ),
-                      label: '',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Padding(
-                        padding: EdgeInsetsDirectional.only(start: 60.w),
-                        child: SvgPicture.asset('assets/svg/mail.svg'),
-                      ),
-                      label: "",
-                    ),
-                    BottomNavigationBarItem(
-                      icon: SvgPicture.asset('assets/svg/user.svg'),
-                      label: '',
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: _onPageChanged,
+            children: _pages,
           ),
           Positioned(
-            bottom: 0, // Adjust the vertical position of the logo
+            bottom: 0,
             left: 0,
             right: 0,
-            child: Transform.translate(
-              offset: Offset(0, -20.h),
-              child: Container(
-                width: 205.w, // Adjust logo size
-                height: 150.h,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle, // Make it circular
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildNavItem(
+                          index: 0,
+                          icon: 'assets/svg/lock.svg',
+                        ),
+                        _buildNavItem(
+                          index: 1,
+                          icon: 'assets/svg/search.svg',
+                        ),
+                        _buildNavItem(
+                          index: 2,
+                          icon: 'assets/svg/app_logo.svg',
+                        ),
+                        _buildNavItem(
+                          index: 3,
+                          icon: 'assets/svg/mail.svg',
+                        ),
+                        _buildNavItem(
+                          index: 4,
+                          icon: 'assets/svg/user.svg',
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SvgPicture.asset('assets/svg/app_logo.svg',
-                      fit: BoxFit.contain),
-                ),
-              ),
+              ],
             ),
           ),
         ],
@@ -143,11 +111,15 @@ class _MekaScreenState extends State<MekaScreen> {
     );
   }
 
-  @override
-  Future<void> didChangeDependencies() async {
-    context.read<UserBloc>().getUser();
-    sl<ApiConsumer>().updateHeader(
-        {"Authorization": ' Bearer ${await CacheManager.getAccessToken()}'});
-    super.didChangeDependencies();
+  Widget _buildNavItem({required int index, required String icon}) {
+    return GestureDetector(
+      onTap: () => _onItemTapped(index),
+      child: SvgPicture.asset(
+        icon,
+        width: 24.w,
+        height: 24.h,
+        color: _selectedIndex == index ? Colors.blue : Colors.grey,
+      ),
+    );
   }
 }

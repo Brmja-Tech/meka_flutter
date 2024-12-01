@@ -12,6 +12,7 @@ import 'package:meka/main.dart';
 import 'package:meka/service_locator/auth_service_locator.dart';
 import 'package:meka/service_locator/chat_service_loactor.dart';
 import 'package:meka/service_locator/loader_service_locator.dart';
+import 'package:meka/service_locator/offers_service_locator.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 final sl = GetIt.instance;
@@ -63,5 +64,6 @@ class DI {
     await AuthServiceLocator.execute(sl: sl);
     await LoaderServiceLocator.execute(sl: sl);
     await ChatServiceLocator.execute(sl: sl);
+    await OffersServiceLocator.execute(sl: sl);
   }
 }

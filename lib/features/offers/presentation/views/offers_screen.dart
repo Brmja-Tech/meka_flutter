@@ -11,6 +11,7 @@ import 'package:meka/core/stateful/grid_wrap.dart';
 import 'package:meka/core/stateless/gaps.dart';
 import 'package:meka/core/stateless/image_from_internet.dart';
 import 'package:meka/core/theme/app_colors.dart';
+import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 
 class OfferScreen extends StatefulWidget {
   const OfferScreen({super.key});
@@ -100,23 +101,23 @@ class _OfferScreenState extends State<OfferScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "محمد السباعي",
+              UserBloc.to.state.user!.name,
               style: context.textTheme.bodyLarge!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
             Row(
               children: [
-                Text("المهندسين الجيزه",
+                Text(UserBloc.to.state.user!.phoneNumber,
                     style: context.textTheme.bodyLarge!
                         .copyWith(color: Colors.grey)),
-                Gaps.h10(),
-                InkWell(
-                  onTap: () {},
-                  child: Icon(
-                    Icons.arrow_downward_sharp,
-                    color: Colors.blue[700],
-                  ),
-                ),
+                // Gaps.h10(),
+                // InkWell(
+                //   onTap: () {},
+                //   child: Icon(
+                //     Icons.arrow_downward_sharp,
+                //     color: Colors.blue[700],
+                //   ),
+                // ),
               ],
             ),
           ],

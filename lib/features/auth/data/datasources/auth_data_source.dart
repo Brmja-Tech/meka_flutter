@@ -8,11 +8,13 @@ import 'package:meka/core/network/firebase_helper/firebase_consumer.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/either.dart';
 import 'package:meka/core/network/http/endpoints.dart';
+import 'package:meka/features/auth/data/models/register_response_model.dart';
 import 'package:meka/features/auth/data/models/user_model.dart';
+import 'package:meka/features/auth/domain/entities/register_response_entity.dart';
 import 'package:meka/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthDataSource {
-  Future<Either<Failure, void>> register(RegisterParams params);
+  Future<Either<Failure, RegisterResponseEntity>> register(RegisterParams params);
 
   Future<Either<Failure, UserEntity>> oTPVerify(OTPVerifyParams params);
 
@@ -60,11 +62,15 @@ class AuthDataSourceImpl implements AuthDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> register(RegisterParams params) async {
+  Future<Either<Failure, RegisterResponseEntity>> register(RegisterParams params) async {
     final result =
         await _apiConsumer.post(EndPoints.register, data: params.toJson());
-    return result.fold((l) => Left(l), (r) {
-      return Right(null);
+    return result.fold((l) => Left(l), (r) async{
+      await CacheManager.saveAccessToken(r['data']['token']);
+      _apiConsumer
+          .updateHeader({"Authorization": ' Bearer ${r['data']['token']}'});
+
+      return Right(RegisterResponseModel.fromJson(r['data']));
     });
   }
 
@@ -98,13 +104,14 @@ class AuthDataSourceImpl implements AuthDataSource {
     final result = await _firebaseApiConsumer.loginWithGoogle();
     return result.fold((l) => Left(l), (r) async {
       final fcmToken = await FirebaseMessaging.instance.getToken() ?? '';
-      _socialLogin(SocialAuthParams(
+      final socialAuth = await _socialLogin(SocialAuthParams(
         email: r.user!.email!,
         name: r.user!.displayName!,
         providerType: 'google',
         providerId: r.credential!.providerId,
         fcmToken: fcmToken,
       ));
+      socialAuth.fold((l) => Left(l), (r) {});
       return Right(null);
     });
   }
@@ -186,6 +193,7 @@ class LoginParams extends Equatable {
 
 class RegisterParams extends Equatable {
   final String email;
+  final String fcmToken;
   final String password;
   final String phone;
   final int type;
@@ -195,6 +203,7 @@ class RegisterParams extends Equatable {
         'email': email,
         'password': password,
         'type': type,
+        'fcm_token': fcmToken,
         'name': name,
         'phone': phone,
         'terms_and_conditions': 1
@@ -204,11 +213,12 @@ class RegisterParams extends Equatable {
       {required this.email,
       required this.password,
       required this.phone,
+      required this.fcmToken,
       required this.type,
       required this.name});
 
   @override
-  List<Object?> get props => [email, password, phone, type, name];
+  List<Object?> get props => [email, password, phone, type, name, fcmToken];
 }
 
 final class ResetPasswordParams extends Equatable {
