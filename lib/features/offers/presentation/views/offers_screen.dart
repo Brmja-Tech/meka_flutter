@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/extensions/color_extension.dart';
 import 'package:meka/core/extensions/context.extension.dart';
@@ -12,6 +13,9 @@ import 'package:meka/core/stateless/gaps.dart';
 import 'package:meka/core/stateless/image_from_internet.dart';
 import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
+import 'package:meka/features/offers/presentation/blocs/offers/offers_bloc.dart';
+import 'package:meka/features/offers/presentation/blocs/offers/offers_state.dart';
+import 'package:meka/service_locator/service_locator.dart';
 
 class OfferScreen extends StatefulWidget {
   const OfferScreen({super.key});
@@ -46,41 +50,52 @@ class _OfferScreenState extends State<OfferScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 60.0.w),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildHeader(context),
-              CustomTextField(
-                maxLines: null,
-                minLines: 1,
-                textInputAction: TextInputAction.newline,
-                textInputType: TextInputType.multiline,
-                controller: _searchController,
-                hintText: "ابحث عن",
-                obscureText: false,
-                svgPath: 'assets/svg/search.svg',
-              ),
-              Gaps.vertical(context.screenHeight * 0.02),
-              _buildBanner(context),
-              Gaps.vertical(context.screenHeight * 0.01),
-              _buildInfo(context),
-              Gaps.vertical(context.screenHeight * 0.01),
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: Text(
-                  'اختر الخدمه',
-                  style: context.textTheme.bodyLarge!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 40.sp,
-                    color: Colors.black54,
-                  ),
-                ),
-              ),
-              const GridWrap(),
-            ],
+    return BlocProvider(
+      create: (context) => sl<OffersBloc>()..getBanners()..getOffers(),
+      child: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 60.0.w),
+          child: SingleChildScrollView(
+            child: BlocBuilder<OffersBloc,OffersState>(
+              builder: (context,state) {
+                if(state.isLoading){
+                  return const Center(child: CircularProgressIndicator(),);
+                }
+                return Column(
+                  children: [
+                    _buildHeader(context),
+                    Gaps.v18(),
+                    CustomTextField(
+                      maxLines: null,
+                      minLines: 1,
+                      textInputAction: TextInputAction.newline,
+                      textInputType: TextInputType.multiline,
+                      controller: _searchController,
+                      hintText: "ابحث عن",
+                      obscureText: false,
+                      svgPath: 'assets/svg/search.svg',
+                    ),
+                    Gaps.vertical(context.screenHeight * 0.02),
+                    _buildBanner(context),
+                    Gaps.vertical(context.screenHeight * 0.01),
+                    _buildInfo(context),
+                    Gaps.vertical(context.screenHeight * 0.01),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        'اختر الخدمه',
+                        style: context.textTheme.bodyLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 40.sp,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
+                    const GridWrap(),
+                  ],
+                );
+              }
+            ),
           ),
         ),
       ),
@@ -127,34 +142,37 @@ class _OfferScreenState extends State<OfferScreen> {
   }
 
   Widget _buildBanner(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 0.w),
-      height: 350.h,
-      width: context.screenWidth - 120.w,
-      child: CarouselSliderWidget(
-          height: 300.h,
-          autoPlay: true,
-          autoPlayInterval: const Duration(seconds: 3),
-          widgets: List.generate(5, (index) {
-            return Container(
-              // height: 150.h,
-              margin: EdgeInsets.symmetric(horizontal: 20.w),
-              // padding: EdgeInsets.symmetric(horizontal: 80.w),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: ImageFromInternet(
-                height: 350.h,
-                width: context.screenWidth - 120.w,
-                borderRadius: BorderRadius.circular(20),
-                image:
-                    'https://www.hoistcrane.com/wp-content/uploads/2017/05/Header-stock-photo-portrait-of-construction-worker-on-building-site-303643508-e1495218037891.jpg',
-                isCircle: false,
-                fit: BoxFit.fill,
-              ),
-            );
-          })),
+    return BlocBuilder<OffersBloc, OffersState>(
+      builder: (context, state) {
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 0.w),
+          height: 350.h,
+          width: context.screenWidth - 120.w,
+          child: CarouselSliderWidget(
+              height: 300.h,
+              autoPlay: true,
+              autoPlayInterval: const Duration(seconds: 3),
+              widgets: List.generate(state.banners.length, (index) {
+                return Container(
+                  // height: 150.h,
+                  margin: EdgeInsets.symmetric(horizontal: 20.w),
+                  // padding: EdgeInsets.symmetric(horizontal: 80.w),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: ImageFromInternet(
+                    height: 350.h,
+                    width: context.screenWidth - 120.w,
+                    borderRadius: BorderRadius.circular(20),
+                    image: state.banners[index].imageUrl,
+                    isCircle: false,
+                    fit: BoxFit.fill,
+                  ),
+                );
+              })),
+        );
+      },
     );
   }
 

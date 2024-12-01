@@ -58,7 +58,7 @@ class AuthDataSourceImpl implements AuthDataSource {
       await CacheManager.saveAccessToken(r['data']['token']);
       await CacheManager.saveRole(
           r['data']['user']['user_type'] == 'User' ? true : false);
-      final bool role = await CacheManager.getRole()?? false;
+      final bool role = await CacheManager.getRole() ?? false;
       log('role is $role');
       _apiConsumer
           .updateHeader({"Authorization": ' Bearer ${r['data']['token']}'});
@@ -198,7 +198,10 @@ class AuthDataSourceImpl implements AuthDataSource {
     final result =
         await _apiConsumer.post(EndPoints.socialLogin, data: params.toJson());
     return result.fold((l) => Left(l), (r) async {
-      CacheManager.saveAccessToken(r['data']['token']);
+      await CacheManager.saveAccessToken(r['data']['token']);
+      await CacheManager.saveRole(
+          r['data']['user']['user_type'] == 'User' ? true : false);
+
       _apiConsumer.updateHeader(
           {'Authorization': 'Bearer ${await CacheManager.getAccessToken()}'});
       return Right(UserModel.fromJson(r['data']));

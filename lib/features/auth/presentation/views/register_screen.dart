@@ -34,8 +34,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
-  List<bool> isSelected = [true, false]; // Initial state: "Driver" selected
-  bool isDriver = true; // Default value
+  final ValueNotifier<bool> _isTermsAccepted = ValueNotifier(false);
+  List<int> isSelected = [0, 2]; // 0 for User, 1 for Driver
+  bool isDriver = true;
 
   @override
   void dispose() {
@@ -45,6 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _phoneController.dispose();
+    _isTermsAccepted.dispose();
     super.dispose();
   }
 
@@ -60,113 +62,128 @@ class _RegisterScreenState extends State<RegisterScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  // Gaps.vertical(context.screenHeight * 0.08),
                   const CustomAppbar(),
                   Gaps.vertical(context.screenHeight * 0.05),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 30.0.w),
                     child: Align(
-                        alignment: context.isArabic
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Text(
-                          LocaleKeys.createYourAccount.tr(),
-                          style: context.textTheme.headlineLarge,
-                        )),
+                      alignment: context.isArabic
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
+                      child: Text(
+                        LocaleKeys.createYourAccount.tr(),
+                        style: context.textTheme.headlineLarge,
+                      ),
+                    ),
                   ),
-                  //username
                   CustomTextField(
                     hintText: LocaleKeys.name.tr(),
-                    // svgPath: 'assets/svg/mail.svg',
                     obscureText: false,
                     controller: _nameController,
                     prefixPath: 'assets/svg/user.svg',
                   ),
                   Gaps.vertical(context.screenHeight * 0.001),
-                  //phone
                   CustomTextField(
                     hintText: LocaleKeys.phone.tr(),
                     maxLength: 11,
-                    // svgPath: 'assets/svg/lock.svg',
                     obscureText: false,
                     controller: _phoneController,
                     prefixPath: 'assets/svg/phone.svg',
                     textInputType: TextInputType.number,
                   ),
                   Gaps.vertical(context.screenHeight * 0.001),
-                  //email
                   CustomTextField(
                     hintText: LocaleKeys.email.tr(),
-                    // svgPath: 'assets/svg/mail.svg',
                     obscureText: false,
                     controller: _emailController,
                     prefixPath: 'assets/svg/email.svg',
                   ),
                   Gaps.vertical(context.screenHeight * 0.001),
-                  //password
                   CustomTextField(
                     hintText: LocaleKeys.password.tr(),
                     svgPath: 'assets/svg/eye.svg',
                     obscureText: true,
                     prefixPath: 'assets/svg/lock.svg',
                     controller: _passwordController,
-                    textAlign: TextAlign.start,
                     textInputType: TextInputType.visiblePassword,
                   ),
                   Gaps.vertical(context.screenHeight * 0.001),
-                  //confirm password
                   CustomTextField(
                     hintText: LocaleKeys.confirmPassword.tr(),
                     svgPath: 'assets/svg/eye.svg',
                     prefixPath: 'assets/svg/lock.svg',
                     obscureText: true,
                     controller: _confirmPasswordController,
-                    textAlign: TextAlign.start,
-                    textInputType: TextInputType.visiblePassword,
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'confirm password is required';
+                        return 'Confirm password is required';
                       }
                       if (value != _passwordController.text.trim()) {
-                        return 'password does not match';
+                        return 'Password does not match';
                       }
                       return null;
                     },
                   ),
-                  Gaps.v48(),
+                  Gaps.v28(),
                   ToggleButtons(
                     borderColor: Colors.grey,
                     fillColor: AppColors.primaryColor,
                     borderWidth: 2,
                     selectedBorderColor: AppColors.primaryColor,
-                    selectedColor: Colors.white,
+                    selectedColor: AppColors.primaryColor,
                     borderRadius: BorderRadius.circular(8),
-                    isSelected: isSelected,
+                    isSelected: isSelected.map((e) => e != 0).toList(),  // Convert 0 to false, 2 to true
                     onPressed: (int index) {
                       setState(() {
                         for (int i = 0; i < isSelected.length; i++) {
-                          isSelected[i] = i == index; // Toggle selection
+                          isSelected[i] = i == index ? (index == 0 ? 0 : 2) : 0; // 0 for Rider, 2 for Driver
                         }
-                        isDriver = index ==
-                            0; // If first button is selected, it's "Driver"
-                        log(isSelected.toString());
+                        isDriver = index == 1; // Set isDriver based on selection
+                        log(isDriver ? 'Driver selected' : 'Rider selected');
                       });
                     },
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Text(LocaleKeys.driver.tr(),
-                            style: const TextStyle(fontSize: 16)),
+                        child: Text(
+                          LocaleKeys.driver.tr(),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: isSelected[0] == 2 ? FontWeight.bold : FontWeight.normal, // 2 for Driver
+                            color: isSelected[0] == 2 ? Colors.black : Colors.white,
+                          ),
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Text(LocaleKeys.rider.tr(),
-                            style: const TextStyle(fontSize: 16)),
+                        child: Text(
+                          LocaleKeys.rider.tr(),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: isSelected[1] == 0 ? FontWeight.bold : FontWeight.normal, // 0 for Rider
+                            color: isSelected[1] == 0 ? Colors.black : Colors.white,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  Gaps.v48(),
-
+                  Gaps.v28(),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _isTermsAccepted,
+                    builder: (context, isAccepted, _) {
+                      return CheckboxListTile(
+                        value: isAccepted,
+                        onChanged: (value) {
+                          _isTermsAccepted.value = value!;
+                        },
+                        title: Text(
+                          'الموافقة على الشروط والاحكام',
+                          style: context.textTheme.bodyLarge,
+                        ),
+                        controlAffinity: ListTileControlAffinity.leading,
+                      );
+                    },
+                  ),
                   BlocConsumer<AuthBloc, AuthState>(
                     listener: (context, state) {
                       if (state.isSocialAuthSuccess) {
@@ -193,9 +210,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         radius: 15,
                         textStyle: context.theme.textTheme.bodyLarge!
                             .copyWith(color: Colors.white),
-                        // color: AppCol,
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
+                        onPressed: () {
+                          if (_formKey.currentState!.validate() &&
+                              _isTermsAccepted.value) {
                             context.read<AuthBloc>().register(
                                   _emailController.text.trim(),
                                   _passwordController.text.trim(),
@@ -203,75 +220,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   _phoneController.text.trim(),
                                   !isDriver ? 0 : 2,
                                 );
+                          } else if (!_isTermsAccepted.value) {
+                            context.showErrorMessage('please accept terms');
                           }
                         },
                       );
                     },
                   ),
-                  Gaps.vertical(context.screenHeight * 0.01),
-                  RichText(
-                    text: TextSpan(
-                      text: LocaleKeys.alreadyHaveAccount.tr(), // The main text
-                      style: context.theme.textTheme.labelLarge!
-                          .copyWith(color: Colors.grey),
-                      children: [
-                        TextSpan(
-                          text: '\t${LocaleKeys.signInNow.tr()}',
-                          // The clickable part
-                          style: const TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.normal,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              context.pop();
-                            },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Gaps.vertical(context.screenHeight * 0.02),
-                  Text(LocaleKeys.continueWith.tr()),
-
-                  Gaps.vertical(context.screenHeight * 0.01),
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0.h),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (Platform.isIOS) ...[
-                          InkWell(
-                              onTap: () {
-                                context.read<AuthBloc>().appleSignIn();
-                              },
-                              child: SvgPicture.asset(
-                                'assets/svg/apple.svg',
-                                width: 60.w,
-                              )),
-                          Gaps.h48()
-                        ],
-                        InkWell(
-                            onTap: () {
-                              context.read<AuthBloc>().googleSignIn();
-                            },
-                            child: SvgPicture.asset(
-                              'assets/svg/google.svg',
-                              width: 60.w,
-                            )),
-                        Gaps.h48(),
-                        InkWell(
-                            onTap: () {
-                              context.read<AuthBloc>().facebookSignIn();
-                            },
-                            child: SvgPicture.asset(
-                              'assets/svg/facebook.svg',
-                              width: 60.w,
-                            )),
-                      ],
-                    ),
-                  ),
-                  Gaps.v48(),
                 ],
               ),
             ),

@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
+import 'package:meka/core/stateless/gaps.dart';
 import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/chat/presentation/views/chat_screen.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
@@ -24,19 +26,11 @@ class MekaScreen extends StatefulWidget {
 }
 
 class _MekaScreenState extends State<MekaScreen> {
-  @override
-  Future<void> didChangeDependencies() async {
-    await context.read<UserBloc>().getUser();
-    sl<ApiConsumer>().updateHeader(
-        {"Authorization": ' Bearer ${await CacheManager.getAccessToken()}'});
-    super.didChangeDependencies();
-  }
-
   final PageController _pageController = PageController();
-
   int _selectedIndex = 0;
+  bool _isUser = true; // Default value; updated based on the role
 
-  final List<Widget> _pages = [
+  final List<Widget> _userPages = [
     const OfferScreen(),
     const MapsScreen(),
     const HomeScreen(),
@@ -44,16 +38,30 @@ class _MekaScreenState extends State<MekaScreen> {
     BlocProvider(create: (_) => sl<AuthBloc>(), child: const ProfilePage()),
   ];
 
+  final List<Widget> _driverPages = [
+    const MapsScreen(),
+    const ChatScreen(),
+    BlocProvider(create: (_) => sl<AuthBloc>(), child: const ProfilePage()),
+  ];
+
+  @override
+  Future<void> didChangeDependencies() async {
+    super.didChangeDependencies();
+    final role = await CacheManager.getRole() ?? true; // Default to user
+    setState(() {
+      _isUser = role;
+    });
+    sl<ApiConsumer>().updateHeader(
+        {"Authorization": ' Bearer ${await CacheManager.getAccessToken()}'});
+  }
+
   void _onPageChanged(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  void _onItemTapped(int index) async{
-    await CacheManager.getRole();
-    // log('role is ${await CacheManager.getRole()}');
-    // CacheManager.clear();
+  void _onItemTapped(int index) {
     _pageController.jumpToPage(index);
     setState(() {
       _selectedIndex = index;
@@ -62,6 +70,21 @@ class _MekaScreenState extends State<MekaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final pages = _isUser ? _userPages : _driverPages;
+    final navItems = _isUser
+        ? [
+      _buildNavItem(index: 0, icon: 'assets/svg/lock.svg'),
+      _buildNavItem(index: 1, icon: 'assets/svg/search.svg'),
+      Gaps.horizontal(context.screenWidth * 0.06),
+      _buildNavItem(index: 3, icon: 'assets/svg/mail.svg'),
+      _buildNavItem(index: 4, icon: 'assets/svg/user.svg'),
+    ]
+        : [
+      _buildNavItem(index: 0, icon: 'assets/svg/chat.svg'),
+      _buildNavItem(index: 1, icon: 'assets/svg/chat.svg'),
+      _buildNavItem(index: 2, icon: 'assets/svg/chat.svg'),
+    ];
+
     return Scaffold(
       body: Stack(
         children: [
@@ -69,7 +92,7 @@ class _MekaScreenState extends State<MekaScreen> {
             controller: _pageController,
             physics: const NeverScrollableScrollPhysics(),
             onPageChanged: _onPageChanged,
-            children: _pages,
+            children: pages,
           ),
           Positioned(
             bottom: 0,
@@ -78,11 +101,12 @@ class _MekaScreenState extends State<MekaScreen> {
             child: Stack(
               alignment: Alignment.center,
               children: [
+                // Bottom navigation bar
                 Container(
                   margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                  const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
@@ -96,33 +120,28 @@ class _MekaScreenState extends State<MekaScreen> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildNavItem(
-                          index: 0,
-                          icon: 'assets/svg/lock.svg',
-                        ),
-                        _buildNavItem(
-                          index: 1,
-                          icon: 'assets/svg/search.svg',
-                        ),
-                        _buildNavItem(
-                          index: 2,
-                          icon: 'assets/svg/app_logo.svg',
-                        ),
-                        _buildNavItem(
-                          index: 3,
-                          icon: 'assets/svg/mail.svg',
-                        ),
-                        _buildNavItem(
-                          index: 4,
-                          icon: 'assets/svg/user.svg',
-                        ),
-                      ],
+                    child: Padding(
+                      padding: EdgeInsets.all(20.w),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: navItems,
+                      ),
                     ),
                   ),
                 ),
+                // App logo in the center
+                if (_isUser)
+                  Positioned(
+                    bottom: 25, // Adjust to slightly overlap the navigation bar
+                    child: GestureDetector(
+                      onTap: () => _onItemTapped(2), // Navigate to HomeScreen
+                      child: SvgPicture.asset(
+                        'assets/svg/app_logo.svg',
+                        width: 80.w,
+                        height: 80.h,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -131,14 +150,23 @@ class _MekaScreenState extends State<MekaScreen> {
     );
   }
 
-  Widget _buildNavItem({required int index, required String icon}) {
+  Widget _buildNavItem({
+    required int index,
+    required String icon,
+    bool isHome = false,
+    final Color? color,
+  }) {
     return GestureDetector(
       onTap: () => _onItemTapped(index),
       child: SvgPicture.asset(
         icon,
-        width: 24.w,
-        height: 24.h,
-        color: _selectedIndex == index ? Colors.blue : Colors.grey,
+        width: isHome ? 80.w : 30.w,
+        height: isHome ? 80.w : 30.h,
+        color: isHome
+            ? null
+            : _selectedIndex == index
+            ? Colors.blue
+            : Colors.black,
       ),
     );
   }
