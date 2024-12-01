@@ -191,7 +191,13 @@ class AuthDataSourceImpl implements AuthDataSource {
     final result =
         await _apiConsumer.post(EndPoints.socialLogin, data: params.toJson());
     return result.fold(
-        (l) => Left(l), (r) => Right(UserModel.fromJson(r['data'])));
+        (l) => Left(l), (r) async{
+          CacheManager.saveAccessToken(r['data']['token']);
+          _apiConsumer.updateHeader({
+            'Authorization': 'Bearer ${await CacheManager.getAccessToken()}'
+          });
+          return Right(UserModel.fromJson(r['data']));
+        });
   }
 }
 
