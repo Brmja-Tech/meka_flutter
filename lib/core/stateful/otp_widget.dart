@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/extensions/context.extension.dart';
+import 'package:meka/core/helper/functions.dart';
 import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
 import 'package:meka/features/auth/presentation/views/reset_password_screen.dart';
@@ -54,13 +55,8 @@ class _OTPWidgetState extends State<OTPWidget> {
     if (otp.length == otpLength) {
       try {
         await widget.onDone(otp); // Trigger API request
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP verified successfully!')),
-        );
       } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to verify OTP: $error')),
-        );
+        loggerError(error.toString());
       }
     }
   }

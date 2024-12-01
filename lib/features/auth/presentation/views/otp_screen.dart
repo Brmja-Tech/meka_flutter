@@ -21,8 +21,8 @@ class OTPScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log('otp is $otp');
-    log('email is ${context.read<AuthBloc>().state.user!.email}');
-    log('phone is ${context.read<AuthBloc>().state.user!.phoneNumber}');
+    // log('email is ${context.read<AuthBloc>().state.user!.email}');
+    // log('phone is ${context.read<AuthBloc>().state.user!.phoneNumber}');
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(
