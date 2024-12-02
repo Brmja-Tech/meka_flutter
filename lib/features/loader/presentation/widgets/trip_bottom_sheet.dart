@@ -166,7 +166,14 @@ void showTripBottomSheet(BuildContext context, String address, String origin) {
                       if (state.isBolyline) {
                         await context.read<LoaderBloc>().getDirection(origin,
                             '${state.coordinate!.latitude},${state.coordinate!.longitude}');
-                        if(context.mounted)context.pop();
+                        if (context.mounted) {
+                          if (MediaQuery.of(context).viewInsets.bottom > 0) {
+                            FocusScope.of(context).unfocus();
+                            await Future.delayed(
+                                const Duration(milliseconds: 300));
+                            if (context.mounted) context.pop();
+                          }
+                        }
                       }
                     },
                     child: BlocBuilder<LoaderBloc, LoaderState>(
@@ -182,16 +189,13 @@ void showTripBottomSheet(BuildContext context, String address, String origin) {
                             destination = destinationController.text;
                             if (destination.isNotEmpty) {
                               // coordinates
-                              await context
-                                  .read<LoaderBloc>()
-                                  .getCoordinates(
-                                      destinationController.text.trim());
+                              await context.read<LoaderBloc>().getCoordinates(
+                                  destinationController.text.trim());
                             }
                           },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  8), // Adjust the value as needed
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             backgroundColor: Colors.blue,
                             padding: const EdgeInsets.symmetric(vertical: 12),

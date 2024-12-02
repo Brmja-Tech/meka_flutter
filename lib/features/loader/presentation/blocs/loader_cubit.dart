@@ -88,6 +88,10 @@ class LoaderBloc extends Cubit<LoaderState> {
             status: LoaderStatus.failure, errorMessage: left.message));
         log('Failure');
       }, (r) async {
+        if(r['results'].isEmpty){
+          emit(state.copyWith(errorMessage: 'اكتب عنوانا اخر', status: LoaderStatus.failure));
+          return;
+        }
         final location = r['results'][0]['geometry']['location'];
         final latLng = LatLng(location['lat'], location['lng']);
         // Future.delayed(Duration(seconds: ))
