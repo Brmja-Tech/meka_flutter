@@ -12,10 +12,9 @@ class LoaderBloc extends Cubit<LoaderState> {
   LoaderBloc() : super(LoaderState());
 
   void resetState() {
-
-      emit(state.copyWith(status: LoaderStatus.initial));
-
+    emit(state.copyWith(status: LoaderStatus.initial));
   }
+
   Future<void> getDirection(String origin, String destination) async {
     emit(state.copyWith(status: LoaderStatus.loading));
     final result =
@@ -77,29 +76,31 @@ class LoaderBloc extends Cubit<LoaderState> {
     });
   }
 
-
-
   Future<void> getCoordinates(String destination) async {
-
-      emit(state.copyWith(status: LoaderStatus.loading));
-      final result = await sl<GoogleMapsConsumer>().getCoordinates(destination);
-      result.fold((left) {
+    emit(state.copyWith(status: LoaderStatus.loading));
+    final result = await sl<GoogleMapsConsumer>().getCoordinates(destination);
+    result.fold((left) {
+      emit(state.copyWith(
+          status: LoaderStatus.failure, errorMessage: left.message));
+      log('Failure');
+    }, (r) async {
+      if (r['results'].isEmpty) {
         emit(state.copyWith(
-            status: LoaderStatus.failure, errorMessage: left.message));
-        log('Failure');
-      }, (r) async {
-        if(r['results'].isEmpty){
-          emit(state.copyWith(errorMessage: 'اكتب عنوانا اخر', status: LoaderStatus.failure));
-          return;
-        }
-        final location = r['results'][0]['geometry']['location'];
-        final latLng = LatLng(location['lat'], location['lng']);
-        // Future.delayed(Duration(seconds: ))
-        log('from cubit ${latLng.latitude},${latLng.longitude}');
-        emit(state.copyWith(status: LoaderStatus.ploylined, coordinate: latLng));
-        log('Success');
-      });
-    }
+            errorMessage: 'اكتب عنوانا اخر', status: LoaderStatus.failure));
+        return;
+      }
+      final location = r['results'][0]['geometry']['location'];
+      final latLng = LatLng(location['lat'], location['lng']);
+      // Future.delayed(Duration(seconds: ))
+      log('from cubit ${latLng.latitude},${latLng.longitude}');
+      emit(state.copyWith(coordinate: latLng,status:  LoaderStatus.ploylined));
+      log('Success');
+    });
+  }
 
-
+  Future<void> getDistance(double lat1, double lon1, double lat2, double lon2) async {
+    final result =
+        sl<GoogleMapsConsumer>().calculateDistance(lat1, lon1, lat2, lon2);
+    emit(state.copyWith(distance: result));
+  }
 }

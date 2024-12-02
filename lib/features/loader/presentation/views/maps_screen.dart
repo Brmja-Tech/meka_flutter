@@ -11,7 +11,6 @@ import 'package:meka/core/stateless/custom_button.dart';
 import 'package:meka/features/loader/presentation/blocs/loader_cubit.dart';
 import 'package:meka/features/loader/presentation/blocs/loader_state.dart';
 import 'package:meka/features/loader/presentation/widgets/trip_bottom_sheet.dart';
-import 'package:meka/service_locator/service_locator.dart';
 
 class MapsScreen extends StatefulWidget {
   const MapsScreen({super.key});
@@ -107,18 +106,40 @@ class _MapsScreenState extends State<MapsScreen> {
               if (state.coordinate != null)
                 Marker(
                   markerId: const MarkerId('currentLocation'),
-                  position: LatLng(state.coordinate!.latitude,
-                      state.coordinate!.longitude),
+                  position: LatLng(
+                      state.coordinate!.latitude, state.coordinate!.longitude),
                 ),
             },
             myLocationEnabled: true,
           ),
+          if (state.distance !='0')
+             Positioned(
+              top: 50,
+              child: Container(
+                width: 100,
+                // height: 200,
+                padding: const EdgeInsets.all(5),
+                margin: EdgeInsets.only(top: 50.h),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                ),
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Center(
+                      child: Text(
+                    '${state.distance} KM',
+                    style: TextStyle(
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )),
+                ),
+              )),
           Padding(
             padding: EdgeInsets.only(bottom: 140.0.h),
             child: CustomElevatedButton(
               text: 'اطلب الان',
               onPressed: () async {
-
                 await _checkLocationAndProceed(context);
               },
               textStyle: Theme.of(context)
@@ -134,7 +155,6 @@ class _MapsScreenState extends State<MapsScreen> {
     });
   }
 
-
   Future<void> _checkLocationAndProceed(BuildContext context) async {
     try {
       // Check if location services are enabled
@@ -142,14 +162,15 @@ class _MapsScreenState extends State<MapsScreen> {
       if (!serviceEnabled) {
         serviceEnabled = await _location.requestService();
         if (!serviceEnabled) {
-          context.showErrorMessage('Please enable location services to continue.');
+          context
+              .showErrorMessage('Please enable location services to continue.');
           return;
         }
       }
 
       // Check for location permissions
       location.PermissionStatus permissionGranted =
-      await _location.hasPermission();
+          await _location.hasPermission();
       if (permissionGranted == location.PermissionStatus.denied) {
         permissionGranted = await _location.requestPermission();
         if (permissionGranted != location.PermissionStatus.granted) {
@@ -167,15 +188,15 @@ class _MapsScreenState extends State<MapsScreen> {
 
       log('Origin is ${_currentPosition!.latitude}, ${_currentPosition!.longitude}');
       await _getAddressFromLatLng();
-      if(context.mounted) {
-      context.read<LoaderBloc>().resetState();
+      if (context.mounted) {
+        context.read<LoaderBloc>().resetState();
         showTripBottomSheet(
-        context,
-        currentAddress ?? '',
-        _currentPosition == null
-            ? ''
-            : '${_currentPosition!.latitude},${_currentPosition!.longitude}',
-      );
+          context,
+          currentAddress ?? '',
+          _currentPosition == null
+              ? ''
+              : '${_currentPosition!.latitude},${_currentPosition!.longitude}',
+        );
       }
     } catch (e) {
       print("Error getting location: $e");

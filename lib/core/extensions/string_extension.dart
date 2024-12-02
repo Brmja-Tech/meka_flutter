@@ -4,6 +4,7 @@ extension StringExtension on String {
   String capitalize() {
     return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
+
   String formatUtc({bool twoLines = true}) {
     // Parse the UTC date-time string and convert it to the local time zone
     DateTime dateTime = DateTime.parse(this).toLocal();
@@ -17,7 +18,7 @@ extension StringExtension on String {
     // Replace Western numerals with Arabic-Indic numerals
     String arabicFormatted = formattedDate.replaceAllMapped(
       RegExp(r'[0-9]'),
-          (Match match) => _arabicDigits[match.group(0)!]!,
+      (Match match) => _arabicDigits[match.group(0)!]!,
     );
 
     // Replace AM/PM with Arabic equivalents
@@ -26,7 +27,7 @@ extension StringExtension on String {
         .replaceAll('PM', 'م'); // Replace "PM" with "م"
 
     // Reorder the date parts and insert \n between date and time
-    return _reorderDatePartsWithNewline(arabicFormatted,twoLines);
+    return _reorderDatePartsWithNewline(arabicFormatted, twoLines);
   }
 
   // Helper method to reorder date parts and add \n
@@ -60,4 +61,5 @@ extension StringExtension on String {
     '9': '٩',
   };
 
+  double get toDouble => double.parse(this);
 }

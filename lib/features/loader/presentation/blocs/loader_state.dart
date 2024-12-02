@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-enum LoaderStatus { initial, loading, success, failure,ploylined }
+enum LoaderStatus { initial, loading, success, failure, ploylined }
 
 extension LoaderStatusX on LoaderState {
   bool get isInitial => status == LoaderStatus.initial;
@@ -12,13 +12,14 @@ extension LoaderStatusX on LoaderState {
   bool get isSuccess => status == LoaderStatus.success;
 
   bool get isError => status == LoaderStatus.failure;
+
   bool get isBolyline => status == LoaderStatus.ploylined;
 }
-
 
 class LoaderState {
   final LoaderStatus status;
   final LatLng? coordinate;
+  final String distance;
   final Set<Polyline> polylines;
   final Color? polylineColor;
   final String? errorMessage;
@@ -26,6 +27,7 @@ class LoaderState {
   LoaderState({
     this.status = LoaderStatus.initial,
     this.coordinate,
+    this.distance = '0',
     this.polylines = const {},
     this.polylineColor,
     this.errorMessage,
@@ -34,12 +36,14 @@ class LoaderState {
   LoaderState copyWith({
     LoaderStatus? status,
     LatLng? coordinate,
+    String? distance,
     Set<Polyline>? polylines,
     Color? polylineColor,
     String? errorMessage,
   }) {
     return LoaderState(
       status: status ?? this.status,
+      distance: distance ?? this.distance,
       coordinate: coordinate ?? this.coordinate,
       polylines: polylines ?? this.polylines,
       polylineColor: polylineColor ?? this.polylineColor,
