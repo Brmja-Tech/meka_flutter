@@ -31,10 +31,11 @@ class OffersDataSourceImpl implements OffersDataSource {
       return Left(l);
     },
         (r) {
-          final List<BannerEntity> banners =
-          r['data'].map((e) => BannerModel.fromJson(e)).toList();
+          // final banners = r['data'].map((e) => BannerModel.fromJson(e)).toList() as List<BannerEntity>;
 
-          return Right(banners);
+          final List<BannerEntity> banners = List<BannerEntity>.from(
+            (r['data'] as List).map((e) => BannerModel.fromJson(e)),
+          );          return Right(banners);
         });
   }
 
@@ -57,9 +58,9 @@ class OffersDataSourceImpl implements OffersDataSource {
         queryParameters: params.toJson());
     return result.fold((l) => Left(l),
         (r) {
-          final List<ProductEntity> products =
-          r['data'].map((e) => ProductModel.fromJson(e)).toList();
-
+          final List<ProductEntity> products = List<ProductEntity>.from(
+            (r['data'] as List).map((e) => ProductModel.fromJson(e)),
+          );
           return Right(products);
         });
   }

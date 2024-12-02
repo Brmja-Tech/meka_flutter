@@ -24,6 +24,7 @@ class ChatBloc extends Cubit<ChatState> {
       this._closeConnectionUseCase)
       : super(const ChatState()) {
     _listenForMessages();
+    fetchChatRooms();
   }
 
   final GetChatRoomsUseCase _getChatRoomsUseCase;

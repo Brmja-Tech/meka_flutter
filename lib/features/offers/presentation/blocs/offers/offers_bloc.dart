@@ -7,7 +7,10 @@ import 'package:meka/features/offers/presentation/blocs/offers/offers_state.dart
 
 class OffersBloc extends Cubit<OffersState> {
   OffersBloc(this._getBannersUseCase, this._getOffersUseCase)
-      : super(const OffersState());
+      : super(const OffersState()) {
+    getBanners();
+    getOffers();
+  }
   final GetBannersUseCase _getBannersUseCase;
   final GetOffersUseCase _getOffersUseCase;
 
@@ -20,7 +23,12 @@ class OffersBloc extends Cubit<OffersState> {
         (r) =>
             emit(OffersState(banners: r, status: OffersStateStatus.success)));
   }
-
+  @override
+  Future<void> close() {
+    // Do nothing or add custom logic if needed
+    super.close();
+    return Future.value();
+  }
   List<ProductEntity> offers = [];
   bool isLoadingMore = false;
   bool hasMoreData = true;

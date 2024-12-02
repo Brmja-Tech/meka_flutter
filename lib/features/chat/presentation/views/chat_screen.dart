@@ -9,41 +9,33 @@ import 'package:meka/features/chat/presentation/blocs/chat_home/chat_state.dart'
 import 'package:meka/features/chat/presentation/views/chat_room_screen.dart';
 import 'package:meka/service_locator/service_locator.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends StatelessWidget {
   const ChatScreen({super.key});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
-}
-
-class _ChatScreenState extends State<ChatScreen> {
-  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<ChatBloc>()..fetchChatRooms(),
-      child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-          body: BlocBuilder<ChatBloc, ChatState>(
-            builder: (context, state) {
-              if (state.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: state.chatRooms.length,
-                  itemBuilder: (context, index) {
-                    final room = state.chatRooms[index];
-                    return _buildChatRoomTile(room, index);
-                  });
-            },
-          )),
-    );
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
+        body: BlocBuilder<ChatBloc, ChatState>(
+          builder: (context, state) {
+            if (state.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return ListView.builder(
+                shrinkWrap: true,
+                itemCount: state.chatRooms.length,
+                itemBuilder: (context, index) {
+                  final room = state.chatRooms[index];
+                  return _buildChatRoomTile(room, index,context);
+                });
+          },
+        ));
   }
 
-  Widget _buildChatRoomTile(ChatRoomEntity room, int index) {
+  Widget _buildChatRoomTile(ChatRoomEntity room, int index,BuildContext context) {
     return ListTile(
       style: ListTileStyle.list,
       onTap: () {

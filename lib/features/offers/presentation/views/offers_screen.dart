@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/extensions/color_extension.dart';
 import 'package:meka/core/extensions/context.extension.dart';
-import 'package:meka/core/network/cache_helper/cache_manager.dart';
 import 'package:meka/core/stateful/carousel_slider_widget.dart';
 import 'package:meka/core/stateful/custom_text_field.dart';
 import 'package:meka/core/stateful/grid_wrap.dart';
@@ -13,9 +12,9 @@ import 'package:meka/core/stateless/gaps.dart';
 import 'package:meka/core/stateless/image_from_internet.dart';
 import 'package:meka/core/theme/app_colors.dart';
 import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
+import 'package:meka/features/auth/presentation/blocs/user/user_state.dart';
 import 'package:meka/features/offers/presentation/blocs/offers/offers_bloc.dart';
 import 'package:meka/features/offers/presentation/blocs/offers/offers_state.dart';
-import 'package:meka/service_locator/service_locator.dart';
 
 class OfferScreen extends StatefulWidget {
   const OfferScreen({super.key});
@@ -31,6 +30,7 @@ class _OfferScreenState extends State<OfferScreen> {
 
   @override
   void initState() {
+    log('offers screen init state');
     super.initState();
     _pageController.addListener(() {
       int newIndex = _pageController.page?.toInt() ?? 0;
@@ -50,20 +50,27 @@ class _OfferScreenState extends State<OfferScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<OffersBloc>()..getBanners()..getOffers(),
-      child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 60.0.w),
-          child: SingleChildScrollView(
-            child: BlocBuilder<OffersBloc,OffersState>(
-              builder: (context,state) {
-                if(state.isLoading){
-                  return const Center(child: CircularProgressIndicator(),);
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 60.0.w),
+        child: SingleChildScrollView(
+          child: BlocBuilder<UserBloc, UserState>(
+            builder: (context, userState) {
+              if (userState.isLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return BlocBuilder<OffersBloc, OffersState>(
+                  builder: (context, state) {
+                if (state.isLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
                 return Column(
                   children: [
-                    _buildHeader(context),
+                    _buildHeader(context, userState),
                     Gaps.v18(),
                     CustomTextField(
                       maxLines: null,
@@ -94,15 +101,15 @@ class _OfferScreenState extends State<OfferScreen> {
                     const GridWrap(),
                   ],
                 );
-              }
-            ),
+              });
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, UserState state) {
     return Row(
       children: [
         CircleAvatar(
@@ -112,31 +119,36 @@ class _OfferScreenState extends State<OfferScreen> {
         ),
         // const Spacer(),
         Expanded(child: Container()),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              UserBloc.to.state.user!.name,
-              style: context.textTheme.bodyLarge!
-                  .copyWith(fontWeight: FontWeight.bold),
-            ),
-            Row(
-              children: [
-                Text(UserBloc.to.state.user!.phoneNumber,
-                    style: context.textTheme.bodyLarge!
-                        .copyWith(color: Colors.grey)),
-                // Gaps.h10(),
-                // InkWell(
-                //   onTap: () {},
-                //   child: Icon(
-                //     Icons.arrow_downward_sharp,
-                //     color: Colors.blue[700],
-                //   ),
-                // ),
-              ],
-            ),
-          ],
-        ),
+        if (state.isLoading)
+          const Center(
+            child: CircularProgressIndicator(),
+          )
+        else
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                UserBloc.to.state.user?.name ?? '',
+                style: context.textTheme.bodyLarge!
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
+              Row(
+                children: [
+                  Text(UserBloc.to.state.user?.phoneNumber ?? '',
+                      style: context.textTheme.bodyLarge!
+                          .copyWith(color: Colors.grey)),
+                  // Gaps.h10(),
+                  // InkWell(
+                  //   onTap: () {},
+                  //   child: Icon(
+                  //     Icons.arrow_downward_sharp,
+                  //     color: Colors.blue[700],
+                  //   ),
+                  // ),
+                ],
+              ),
+            ],
+          ),
       ],
     );
   }
@@ -144,6 +156,16 @@ class _OfferScreenState extends State<OfferScreen> {
   Widget _buildBanner(BuildContext context) {
     return BlocBuilder<OffersBloc, OffersState>(
       builder: (context, state) {
+        if(state.isLoading){
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if(state.banners.isEmpty){
+          return const Center(
+            child: Text('لا يوجد اعلانات حاليا'),
+          );
+        }
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 0.w),
           height: 350.h,
