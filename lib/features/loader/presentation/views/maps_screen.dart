@@ -31,18 +31,12 @@ class _MapsScreenState extends State<MapsScreen> {
   }
 
   String? currentAddress;
-  LatLngBounds _getBoundsFromPolyline(Polyline polyline) {
-    double minLat = double.infinity;
-    double maxLat = double.negativeInfinity;
-    double minLng = double.infinity;
-    double maxLng = double.negativeInfinity;
 
-    for (var point in polyline.points) {
-      minLat = min(minLat, point.latitude);
-      maxLat = max(maxLat, point.latitude);
-      minLng = min(minLng, point.longitude);
-      maxLng = max(maxLng, point.longitude);
-    }
+  LatLngBounds _getBoundsFromPolyline(Polyline polyline) {
+    double minLat = polyline.points.map((e) => e.latitude).reduce(min);
+    double maxLat = polyline.points.map((e) => e.latitude).reduce(max);
+    double minLng = polyline.points.map((e) => e.longitude).reduce(min);
+    double maxLng = polyline.points.map((e) => e.longitude).reduce(max);
 
     return LatLngBounds(
       southwest: LatLng(minLat, minLng),
@@ -59,7 +53,7 @@ class _MapsScreenState extends State<MapsScreen> {
       Placemark place = placemarks[0];
       setState(() {
         currentAddress =
-        '${place.street}, ${place.locality}, ${place.administrativeArea}';
+            '${place.street}, ${place.locality}, ${place.administrativeArea}';
       });
     } catch (e) {
       print('Failed to get address: $e');
@@ -68,6 +62,8 @@ class _MapsScreenState extends State<MapsScreen> {
       });
     }
   }
+
+  bool _isMapInitialized = false;
 
   Future<void> _getCurrentLocation() async {
     try {
@@ -78,7 +74,7 @@ class _MapsScreenState extends State<MapsScreen> {
       }
 
       location.PermissionStatus permissionGranted =
-      await _location.hasPermission();
+          await _location.hasPermission();
       if (permissionGranted == location.PermissionStatus.denied) {
         permissionGranted = await _location.requestPermission();
         if (permissionGranted != location.PermissionStatus.granted) return;
@@ -102,20 +98,32 @@ class _MapsScreenState extends State<MapsScreen> {
       print("Error getting location: $e");
     }
   }
+
   @override
   void dispose() {
     // Clear state polylines when the screen is disposed
     // context.read<LoaderBloc>().clearPolylines();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoaderBloc, LoaderState>(builder: (context, state) {
       logger('polyline is ${state.polylines}');
-      if(state.polylines.isNotEmpty){
+      if (_isMapInitialized && state.polylines.isNotEmpty) {
         final bounds = _getBoundsFromPolyline(state.polylines.first);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _mapController.animateCamera(
+            CameraUpdate.newLatLngBounds(bounds, 50), // Padding around the bounds
+          );
+        });
+      }
+
+      if (_isMapInitialized) {
         _mapController.animateCamera(
-          CameraUpdate.newLatLngBounds(bounds , 50),
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: _currentPosition!, zoom: 14),
+          ),
         );
       }
       return Stack(
@@ -129,7 +137,10 @@ class _MapsScreenState extends State<MapsScreen> {
             ),
             polylines: state.polylines,
             onMapCreated: (controller) {
-              _mapController = controller;
+              setState(() {
+                _mapController = controller;
+                _isMapInitialized = true;
+              });
             },
             markers: {
               if (state.coordinate != null)
@@ -141,7 +152,7 @@ class _MapsScreenState extends State<MapsScreen> {
             },
             myLocationEnabled: true,
           ),
-          if (state.distance !='0')
+          if (state.distance != '0')
             Positioned(
                 top: 50,
                 child: Container(
@@ -156,12 +167,12 @@ class _MapsScreenState extends State<MapsScreen> {
                     textDirection: TextDirection.ltr,
                     child: Center(
                         child: Text(
-                          '${state.distance} KM',
-                          style: TextStyle(
-                            fontSize: 30.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
+                      '${state.distance} KM',
+                      style: TextStyle(
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )),
                   ),
                 )),
           Padding(
@@ -199,7 +210,7 @@ class _MapsScreenState extends State<MapsScreen> {
 
       // Check for location permissions
       location.PermissionStatus permissionGranted =
-      await _location.hasPermission();
+          await _location.hasPermission();
       if (permissionGranted == location.PermissionStatus.denied) {
         permissionGranted = await _location.requestPermission();
         if (permissionGranted != location.PermissionStatus.granted) {
@@ -215,7 +226,8 @@ class _MapsScreenState extends State<MapsScreen> {
             LatLng(locationData.latitude!, locationData.longitude!);
       });
 
-      logger('Origin is ${_currentPosition!.latitude}, ${_currentPosition!.longitude}');
+      logger(
+          'Origin is ${_currentPosition!.latitude}, ${_currentPosition!.longitude}');
       await _getAddressFromLatLng();
       if (context.mounted) {
         context.read<LoaderBloc>().resetState();

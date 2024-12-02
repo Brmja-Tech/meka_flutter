@@ -12,7 +12,7 @@ class LoaderBloc extends Cubit<LoaderState> {
   LoaderBloc() : super(LoaderState()) {}
 
   void resetState() {
-    emit(state.copyWith(status: LoaderStatus.initial));
+    emit(state.copyWith(distance: '0',polylines: {},coordinate: null));
   }
 
   void clearPolylines() {

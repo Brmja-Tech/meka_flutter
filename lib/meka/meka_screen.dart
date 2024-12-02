@@ -10,6 +10,7 @@ import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/auth/presentation/blocs/user/user_state.dart';
 import 'package:meka/features/chat/presentation/blocs/chat_home/chat_cubit.dart';
 import 'package:meka/features/chat/presentation/views/chat_screen.dart';
+import 'package:meka/features/loader/presentation/blocs/loader_cubit.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
 import 'package:meka/features/offers/presentation/blocs/offers/offers_bloc.dart';
 import 'package:meka/features/offers/presentation/views/offers_screen.dart';
@@ -174,7 +175,10 @@ class _MekaScreenState extends State<MekaScreen>
     bool isHome = false,
   }) {
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () {
+        context.read<LoaderBloc>().resetState();
+        _onItemTapped(index);
+      },
       child: SvgPicture.asset(
         icon,
         width: isHome ? 80.w : 30.w,
@@ -190,5 +194,5 @@ class _MekaScreenState extends State<MekaScreen>
 
   @override
   // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 }
