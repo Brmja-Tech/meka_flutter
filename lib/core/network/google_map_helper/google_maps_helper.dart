@@ -1,8 +1,11 @@
 import 'dart:math';
 
+import 'package:geocoding/geocoding.dart';
+import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/network/failure/failure.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/either.dart';
+import 'package:meka/main.dart';
 
 abstract class GoogleMapsConsumer {
   Future<Either<Failure, Map<String, dynamic>>> getDirections(
@@ -19,12 +22,49 @@ class GoogleMapsConsumerImpl implements GoogleMapsConsumer {
 
   final String _apiKey = 'AIzaSyCcsdaGkuueZUcHIij1LTTX5IRuzXV90Bc';
 
+
+
   @override
   Future<Either<Failure, Map<String, dynamic>>> getDirections(
       String origin, String destination) async {
-    return await _apiConsumer.get(
-        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$_apiKey');
+    try {
+      final originCoords = origin.split(',');
+      final destinationCoords = destination.split(',');
+      final originLat = double.parse(originCoords[0]);
+      final originLng = double.parse(originCoords[1]);
+      final destinationLat = double.parse(destinationCoords[0]);
+      final destinationLng = double.parse(destinationCoords[1]);
+      final isValidOrigin = await _isLocationInEgypt(originLat, originLng);
+      final isValidDestination = await _isLocationInEgypt(destinationLat, destinationLng);
+      if (!isValidOrigin || !isValidDestination) {
+        _showSnackBar('Destination is outside Egypt. Please search within Egypt.');
+        return Left(GoogleMapFailure(message: 'Invalid destination'));
+      }
+      return await _apiConsumer.get(
+        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$_apiKey',
+      );
+    } catch (e) {
+      return Left(GoogleMapFailure(message: 'Error parsing coordinates or validating location: $e'));
+    }
   }
+  Future<bool> _isLocationInEgypt(double latitude, double longitude) async {
+    try {
+      final List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
+        return placemarks.first.country == 'Egypt';
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void _showSnackBar(String message) {
+    // Assuming you have a global context (like a navigator key) or pass context
+    final context = navigatorKey.currentContext!;
+    context.showErrorMessage(message);
+  }
+
 
   @override
   Future<Either<Failure, Map<String, dynamic>>> getCoordinates(

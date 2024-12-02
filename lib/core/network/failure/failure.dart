@@ -43,3 +43,6 @@ class UnauthorizedFailure extends Failure {
 class NetworkFailure extends Failure {
   NetworkFailure({required String message}) : super(message);
 }
+class GoogleMapFailure extends Failure {
+  GoogleMapFailure({required String message}) : super(message);
+}
