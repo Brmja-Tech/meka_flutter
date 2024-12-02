@@ -10,6 +10,7 @@ import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/auth/presentation/blocs/user/user_state.dart';
 import 'package:meka/features/chat/presentation/blocs/chat_home/chat_cubit.dart';
 import 'package:meka/features/chat/presentation/views/chat_screen.dart';
+import 'package:meka/features/loader/presentation/blocs/loader_cubit.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
 import 'package:meka/features/offers/presentation/blocs/offers/offers_bloc.dart';
 import 'package:meka/features/offers/presentation/views/offers_screen.dart';
@@ -81,17 +82,17 @@ class _MekaScreenState extends State<MekaScreen>
     final pages = _isUser ? _userPages : _driverPages;
     final navItems = _isUser
         ? [
-            _buildNavItem(index: 0, icon: 'assets/svg/lock.svg'),
-            _buildNavItem(index: 1, icon: 'assets/svg/search.svg'),
-            Gaps.horizontal(context.screenWidth * 0.06),
-            _buildNavItem(index: 3, icon: 'assets/svg/mail.svg'),
-            _buildNavItem(index: 4, icon: 'assets/svg/user.svg'),
-          ]
+      _buildNavItem(index: 0, icon: 'assets/svg/lock.svg'),
+      _buildNavItem(index: 1, icon: 'assets/svg/search.svg'),
+      Gaps.horizontal(context.screenWidth * 0.06),
+      _buildNavItem(index: 3, icon: 'assets/svg/mail.svg'),
+      _buildNavItem(index: 4, icon: 'assets/svg/user.svg'),
+    ]
         : [
-            _buildNavItem(index: 0, icon: 'assets/svg/search.svg'),
-            _buildNavItem(index: 1, icon: 'assets/svg/mail.svg'),
-            _buildNavItem(index: 2, icon: 'assets/svg/user.svg'),
-          ];
+      _buildNavItem(index: 0, icon: 'assets/svg/search.svg'),
+      _buildNavItem(index: 1, icon: 'assets/svg/mail.svg'),
+      _buildNavItem(index: 2, icon: 'assets/svg/user.svg'),
+    ];
     return Scaffold(
       body: BlocBuilder<UserBloc, UserState>(
         builder: (context, state) {
@@ -182,8 +183,8 @@ class _MekaScreenState extends State<MekaScreen>
         color: isHome
             ? null
             : _selectedIndex == index
-                ? Colors.blue
-                : Colors.black,
+            ? Colors.blue
+            : Colors.black,
       ),
     );
   }

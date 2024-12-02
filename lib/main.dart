@@ -11,6 +11,7 @@ import 'package:meka/core/theme/light_theme.dart';
 import 'package:meka/features/auth/presentation/blocs/auth/auth_cubit.dart';
 import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/auth/presentation/views/login_screen.dart';
+import 'package:meka/features/loader/presentation/blocs/loader_cubit.dart';
 import 'package:meka/firebase_options.dart';
 import 'package:meka/meka/meka_screen.dart';
 import 'service_locator/service_locator.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => sl<UserBloc>()..getUser()),
+        BlocProvider(create: (context) => sl<LoaderBloc>()),
       ],
       child: ScreenUtilInit(
           designSize: const Size(750, 1334),
