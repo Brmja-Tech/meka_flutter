@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
@@ -7,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meka/core/extensions/context.extension.dart';
+import 'package:meka/core/helper/functions.dart';
 import 'package:meka/core/stateless/custom_button.dart';
 import 'package:meka/features/loader/presentation/blocs/loader_cubit.dart';
 import 'package:meka/features/loader/presentation/blocs/loader_state.dart';
@@ -31,6 +31,24 @@ class _MapsScreenState extends State<MapsScreen> {
   }
 
   String? currentAddress;
+  LatLngBounds _getBoundsFromPolyline(Polyline polyline) {
+    double minLat = double.infinity;
+    double maxLat = double.negativeInfinity;
+    double minLng = double.infinity;
+    double maxLng = double.negativeInfinity;
+
+    for (var point in polyline.points) {
+      minLat = min(minLat, point.latitude);
+      maxLat = max(maxLat, point.latitude);
+      minLng = min(minLng, point.longitude);
+      maxLng = max(maxLng, point.longitude);
+    }
+
+    return LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+  }
 
   Future<void> _getAddressFromLatLng() async {
     try {
@@ -88,7 +106,13 @@ class _MapsScreenState extends State<MapsScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoaderBloc, LoaderState>(builder: (context, state) {
-      log('polyline is ${state.polylines}');
+      logger('polyline is ${state.polylines}');
+      if(state.polylines.isNotEmpty){
+        final bounds = _getBoundsFromPolyline(state.polylines.first);
+        _mapController.animateCamera(
+          CameraUpdate.newLatLngBounds(bounds , 50),
+        );
+      }
       return Stack(
         alignment: Alignment.bottomCenter,
         children: [
@@ -186,7 +210,7 @@ class _MapsScreenState extends State<MapsScreen> {
             LatLng(locationData.latitude!, locationData.longitude!);
       });
 
-      log('Origin is ${_currentPosition!.latitude}, ${_currentPosition!.longitude}');
+      logger('Origin is ${_currentPosition!.latitude}, ${_currentPosition!.longitude}');
       await _getAddressFromLatLng();
       if (context.mounted) {
         context.read<LoaderBloc>().resetState();

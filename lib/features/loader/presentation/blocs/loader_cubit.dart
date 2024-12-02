@@ -69,7 +69,7 @@ class LoaderBloc extends Cubit<LoaderState> {
 
       emit(state.copyWith(
         status: LoaderStatus.success,
-        polylines: {...state.polylines, polyline},
+        polylines: {polyline},
       ));
 
       log('Polyline added with ${polylineCoordinates.length} points');
