@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:meka/core/network/google_map_helper/google_maps_helper.dart';
+import 'package:meka/core/network/google_map_helper/google_maps_consumer.dart';
 import 'package:meka/features/loader/domain/entities/decoded_polyline.dart';
 import 'package:meka/service_locator/service_locator.dart';
 import 'loader_state.dart';
@@ -93,14 +93,20 @@ class LoaderBloc extends Cubit<LoaderState> {
       final latLng = LatLng(location['lat'], location['lng']);
       // Future.delayed(Duration(seconds: ))
       log('from cubit ${latLng.latitude},${latLng.longitude}');
-      emit(state.copyWith(coordinate: latLng,status:  LoaderStatus.ploylined));
+      emit(state.copyWith(coordinate: latLng, status: LoaderStatus.ploylined));
       log('Success');
     });
   }
 
-  Future<void> getDistance(double lat1, double lon1, double lat2, double lon2) async {
-    final result =
-        sl<GoogleMapsConsumer>().calculateDistance(lat1, lon1, lat2, lon2);
-    emit(state.copyWith(distance: result));
+  Future<void> getDistance(
+      double lat1, double lon1, double lat2, double lon2) async {
+    final result = await sl<GoogleMapsConsumer>()
+        .calculateDistance(lat1, lon1, lat2, lon2);
+    emit(result.fold(
+        (left) => state.copyWith(
+            status: LoaderStatus.failure,
+            distance: '0',
+            errorMessage: left.message),
+        (right) => state.copyWith(distance: right)));
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/network/cache_helper/cache_manager.dart';
-import 'package:meka/core/network/google_map_helper/google_maps_helper.dart';
+import 'package:meka/core/network/google_map_helper/google_maps_consumer.dart';
 import 'package:meka/core/network/http/api_consumer.dart';
 import 'package:meka/core/network/http/endpoints.dart';
 import 'package:meka/core/network/socket/pusher_consts.dart';
