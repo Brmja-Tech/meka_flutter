@@ -3,20 +3,86 @@ import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/network/google_map_helper/google_maps_consumer.dart';
 import 'package:meka/features/loader/domain/entities/decoded_polyline.dart';
+import 'package:meka/main.dart';
 import 'package:meka/service_locator/service_locator.dart';
 import 'loader_state.dart';
+import 'package:location/location.dart' as location;
 
 class LoaderBloc extends Cubit<LoaderState> {
-  LoaderBloc() : super(LoaderState()) {}
+  LoaderBloc() : super(LoaderState()) {
+    getCurrentLocation();
+  }
 
   void resetState() {
-    emit(state.copyWith(distance: '0',polylines: {},coordinate: null));
+    emit(state.copyWith(distance: '0', polylines: {}, coordinate: null));
   }
 
   void clearPolylines() {
     emit(state.copyWith(polylines: {}));
+  }
+
+  final location.Location _location = location.Location();
+
+  Future<void> getCurrentLocation() async {
+    emit(state.copyWith(status: LoaderStatus.loading));
+
+    try {
+      // Check if location service is enabled
+      bool serviceEnabled = await _location.serviceEnabled();
+      if (!serviceEnabled) {
+        serviceEnabled = await _location.requestService();
+        if (!serviceEnabled) {
+          emit(state.copyWith(
+            status: LoaderStatus.failure,
+            errorMessage: 'Location services are disabled.',
+          ));
+          return;
+        }
+      }
+
+      // Check for location permissions
+      location.PermissionStatus permissionGranted =
+          await _location.hasPermission();
+      if (permissionGranted == location.PermissionStatus.denied) {
+        permissionGranted = await _location.requestPermission();
+        if (permissionGranted != location.PermissionStatus.granted) {
+          emit(state.copyWith(
+            status: LoaderStatus.failure,
+            errorMessage: 'Location permission denied.',
+          ));
+          return;
+        }
+      }
+
+      // Fetch current location
+      final locationData = await _location.getLocation();
+      if (locationData.latitude == null || locationData.longitude == null) {
+        emit(state.copyWith(
+          status: LoaderStatus.failure,
+          errorMessage: 'Failed to fetch location.',
+        ));
+        return;
+      }
+
+      final currentPosition =
+          LatLng(locationData.latitude!, locationData.longitude!);
+
+      emit(state.copyWith(
+        currentPosition: currentPosition,
+        status: LoaderStatus.success,
+      ));
+
+      log('Current location: ${currentPosition.latitude}, ${currentPosition.longitude}');
+    } catch (e) {
+      emit(state.copyWith(
+        status: LoaderStatus.failure,
+        errorMessage: 'Error getting location: $e',
+      ));
+      log('Error getting location: $e');
+    }
   }
 
   Future<void> getDirection(String origin, String destination) async {
@@ -42,6 +108,8 @@ class LoaderBloc extends Cubit<LoaderState> {
           status: LoaderStatus.failure,
           errorMessage: 'No routes available',
         ));
+        navigatorKey.currentContext!.pop();
+        navigatorKey.currentContext!.showErrorMessage('No routes available');
         return;
       }
 

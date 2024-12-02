@@ -21,13 +21,11 @@ class MapsScreen extends StatefulWidget {
 
 class _MapsScreenState extends State<MapsScreen> {
   final location.Location _location = location.Location();
-  LatLng? _currentPosition;
   late GoogleMapController _mapController;
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
   }
 
   String? currentAddress;
@@ -47,8 +45,8 @@ class _MapsScreenState extends State<MapsScreen> {
   Future<void> _getAddressFromLatLng() async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
-        _currentPosition!.latitude,
-        _currentPosition!.longitude,
+        context.read<LoaderBloc>().state.currentPosition!.latitude,
+        context.read<LoaderBloc>().state.currentPosition!.longitude,
       );
       Placemark place = placemarks[0];
       setState(() {
@@ -65,40 +63,6 @@ class _MapsScreenState extends State<MapsScreen> {
 
   bool _isMapInitialized = false;
 
-  Future<void> _getCurrentLocation() async {
-    try {
-      bool serviceEnabled = await _location.serviceEnabled();
-      if (!serviceEnabled) {
-        serviceEnabled = await _location.requestService();
-        if (!serviceEnabled) return;
-      }
-
-      location.PermissionStatus permissionGranted =
-          await _location.hasPermission();
-      if (permissionGranted == location.PermissionStatus.denied) {
-        permissionGranted = await _location.requestPermission();
-        if (permissionGranted != location.PermissionStatus.granted) return;
-      }
-
-      final locationData = await _location.getLocation();
-      setState(() {
-        _currentPosition =
-            LatLng(locationData.latitude!, locationData.longitude!);
-      });
-
-      // Move the camera to the current location once initialized
-
-      _mapController.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: _currentPosition!, zoom: 14),
-        ),
-      );
-    } catch (e) {
-      // Handle errors like location services being disabled
-      print("Error getting location: $e");
-    }
-  }
-
   @override
   void dispose() {
     // Clear state polylines when the screen is disposed
@@ -114,7 +78,8 @@ class _MapsScreenState extends State<MapsScreen> {
         final bounds = _getBoundsFromPolyline(state.polylines.first);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _mapController.animateCamera(
-            CameraUpdate.newLatLngBounds(bounds, 50), // Padding around the bounds
+            CameraUpdate.newLatLngBounds(
+                bounds, 50), // Padding around the bounds
           );
         });
       }
@@ -122,7 +87,9 @@ class _MapsScreenState extends State<MapsScreen> {
       if (_isMapInitialized) {
         _mapController.animateCamera(
           CameraUpdate.newCameraPosition(
-            CameraPosition(target: _currentPosition!, zoom: 14),
+            CameraPosition(
+                target: context.read<LoaderBloc>().state.currentPosition!,
+                zoom: 14),
           ),
         );
       }
@@ -131,7 +98,8 @@ class _MapsScreenState extends State<MapsScreen> {
         children: [
           GoogleMap(
             initialCameraPosition: CameraPosition(
-              target: _currentPosition ?? const LatLng(30, 30),
+              target: context.read<LoaderBloc>().state.currentPosition ??
+                  const LatLng(30, 30),
               // Default location
               zoom: 14,
             ),
@@ -220,23 +188,23 @@ class _MapsScreenState extends State<MapsScreen> {
       }
 
       // Get current location
-      final locationData = await _location.getLocation();
-      setState(() {
-        _currentPosition =
-            LatLng(locationData.latitude!, locationData.longitude!);
-      });
+      // final locationData = await _location.getLocation();
+      // setState(() {
+      //   context.read<LoaderBloc>().state.currentPosition =
+      //       LatLng(locationData.latitude!, locationData.longitude!);
+      // });
 
       logger(
-          'Origin is ${_currentPosition!.latitude}, ${_currentPosition!.longitude}');
+          'Origin is ${context.read<LoaderBloc>().state.currentPosition!.latitude}, ${context.read<LoaderBloc>().state.currentPosition!.longitude}');
       await _getAddressFromLatLng();
       if (context.mounted) {
         context.read<LoaderBloc>().resetState();
         showTripBottomSheet(
           context,
           currentAddress ?? '',
-          _currentPosition == null
+          context.read<LoaderBloc>().state.currentPosition == null
               ? ''
-              : '${_currentPosition!.latitude},${_currentPosition!.longitude}',
+              : '${context.read<LoaderBloc>().state.currentPosition!.latitude},${context.read<LoaderBloc>().state.currentPosition!.longitude}',
         );
       }
     } catch (e) {

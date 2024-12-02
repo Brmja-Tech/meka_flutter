@@ -19,6 +19,7 @@ extension LoaderStatusX on LoaderState {
 class LoaderState {
   final LoaderStatus status;
   final LatLng? coordinate;
+  final LatLng? currentPosition;
   final String distance;
   final Set<Polyline> polylines;
   final Color? polylineColor;
@@ -27,6 +28,7 @@ class LoaderState {
   LoaderState({
     this.status = LoaderStatus.initial,
     this.coordinate,
+    this.currentPosition,
     this.distance = '0',
     this.polylines = const {},
     this.polylineColor,
@@ -36,6 +38,7 @@ class LoaderState {
   LoaderState copyWith({
     LoaderStatus? status,
     LatLng? coordinate,
+    LatLng? currentPosition,
     String? distance,
     Set<Polyline>? polylines,
     Color? polylineColor,
@@ -45,6 +48,7 @@ class LoaderState {
       status: status ?? this.status,
       distance: distance ?? this.distance,
       coordinate: coordinate ?? this.coordinate,
+      currentPosition: currentPosition ?? this.currentPosition,
       polylines: polylines ?? this.polylines,
       polylineColor: polylineColor ?? this.polylineColor,
       errorMessage: errorMessage ?? this.errorMessage,

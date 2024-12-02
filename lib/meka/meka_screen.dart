@@ -194,5 +194,5 @@ class _MekaScreenState extends State<MekaScreen>
 
   @override
   // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => false;
+  bool get wantKeepAlive => true;
 }
