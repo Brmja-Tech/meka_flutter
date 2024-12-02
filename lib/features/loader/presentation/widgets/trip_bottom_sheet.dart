@@ -7,7 +7,6 @@ import 'package:meka/core/extensions/context.extension.dart';
 import 'package:meka/core/stateless/gaps.dart';
 import 'package:meka/features/loader/presentation/blocs/loader_cubit.dart';
 import 'package:meka/features/loader/presentation/blocs/loader_state.dart';
-import 'package:meka/service_locator/service_locator.dart';
 
 void showTripBottomSheet(BuildContext context, String address, String origin) {
   bool isSelected = true;
@@ -167,12 +166,25 @@ void showTripBottomSheet(BuildContext context, String address, String origin) {
                         await context.read<LoaderBloc>().getDirection(origin,
                             '${state.coordinate!.latitude},${state.coordinate!.longitude}');
                         if (context.mounted) {
+                          // Calculate and emit the distance as soon as you have the coordinates
+                          List<String> coordinates = origin.split(',');
+                          double originLat = double.parse(coordinates[0]);
+                          double originLng = double.parse(coordinates[1]);
+                          await context.read<LoaderBloc>().getDistance(
+                            originLat,
+                            originLng,
+                            state.coordinate!.latitude,
+                            state.coordinate!.longitude,
+                          );
+                          log('Distance is ${state.distance}');
+                        }
+                        if (context.mounted) {
                           if (MediaQuery.of(context).viewInsets.bottom > 0) {
                             FocusScope.of(context).unfocus();
                             await Future.delayed(
                                 const Duration(milliseconds: 300));
-                            if (context.mounted) context.pop();
                           }
+                            if (context.mounted) context.pop();
                         }
                       }
                     },
@@ -188,9 +200,10 @@ void showTripBottomSheet(BuildContext context, String address, String origin) {
 
                             destination = destinationController.text;
                             if (destination.isNotEmpty) {
-                              // coordinates
+
                               await context.read<LoaderBloc>().getCoordinates(
                                   destinationController.text.trim());
+
                             }
                           },
                           style: ElevatedButton.styleFrom(
