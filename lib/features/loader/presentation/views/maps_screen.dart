@@ -59,7 +59,7 @@ class _MapsScreenState extends State<MapsScreen> {
       Placemark place = placemarks[0];
       setState(() {
         currentAddress =
-            '${place.street}, ${place.locality}, ${place.administrativeArea}';
+        '${place.street}, ${place.locality}, ${place.administrativeArea}';
       });
     } catch (e) {
       print('Failed to get address: $e');
@@ -78,7 +78,7 @@ class _MapsScreenState extends State<MapsScreen> {
       }
 
       location.PermissionStatus permissionGranted =
-          await _location.hasPermission();
+      await _location.hasPermission();
       if (permissionGranted == location.PermissionStatus.denied) {
         permissionGranted = await _location.requestPermission();
         if (permissionGranted != location.PermissionStatus.granted) return;
@@ -102,7 +102,12 @@ class _MapsScreenState extends State<MapsScreen> {
       print("Error getting location: $e");
     }
   }
-
+  @override
+  void dispose() {
+    // Clear state polylines when the screen is disposed
+    // context.read<LoaderBloc>().clearPolylines();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoaderBloc, LoaderState>(builder: (context, state) {
@@ -137,28 +142,28 @@ class _MapsScreenState extends State<MapsScreen> {
             myLocationEnabled: true,
           ),
           if (state.distance !='0')
-             Positioned(
-              top: 50,
-              child: Container(
-                width: 100,
-                // height: 200,
-                padding: const EdgeInsets.all(5),
-                margin: EdgeInsets.only(top: 50.h),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: Directionality(
-                  textDirection: TextDirection.ltr,
-                  child: Center(
-                      child: Text(
-                    '${state.distance} KM',
-                    style: TextStyle(
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )),
-                ),
-              )),
+            Positioned(
+                top: 50,
+                child: Container(
+                  width: 100,
+                  // height: 200,
+                  padding: const EdgeInsets.all(5),
+                  margin: EdgeInsets.only(top: 50.h),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                  ),
+                  child: Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Center(
+                        child: Text(
+                          '${state.distance} KM',
+                          style: TextStyle(
+                            fontSize: 30.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )),
+                  ),
+                )),
           Padding(
             padding: EdgeInsets.only(bottom: 140.0.h),
             child: CustomElevatedButton(
@@ -194,7 +199,7 @@ class _MapsScreenState extends State<MapsScreen> {
 
       // Check for location permissions
       location.PermissionStatus permissionGranted =
-          await _location.hasPermission();
+      await _location.hasPermission();
       if (permissionGranted == location.PermissionStatus.denied) {
         permissionGranted = await _location.requestPermission();
         if (permissionGranted != location.PermissionStatus.granted) {

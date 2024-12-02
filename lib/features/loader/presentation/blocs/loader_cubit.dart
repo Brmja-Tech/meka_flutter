@@ -9,20 +9,28 @@ import 'package:meka/service_locator/service_locator.dart';
 import 'loader_state.dart';
 
 class LoaderBloc extends Cubit<LoaderState> {
-  LoaderBloc() : super(LoaderState());
+  LoaderBloc() : super(LoaderState()) {}
 
   void resetState() {
     emit(state.copyWith(status: LoaderStatus.initial));
   }
 
+  void clearPolylines() {
+    emit(state.copyWith(polylines: {}));
+  }
+
   Future<void> getDirection(String origin, String destination) async {
-    emit(state.copyWith(status: LoaderStatus.loading));
+    emit(state.copyWith(
+      status: LoaderStatus.loading,
+      polylines: {},
+    ));
     final result =
         await sl<GoogleMapsConsumer>().getDirections(origin, destination);
     result.fold((left) {
       emit(state.copyWith(
         status: LoaderStatus.failure,
         errorMessage: left.message,
+        polylines: {},
       ));
       log('Failure: ${left.message}');
     }, (r) {
@@ -30,6 +38,7 @@ class LoaderBloc extends Cubit<LoaderState> {
       if (routes.isEmpty) {
         log('No routes found');
         emit(state.copyWith(
+          polylines: {},
           status: LoaderStatus.failure,
           errorMessage: 'No routes available',
         ));
@@ -40,6 +49,7 @@ class LoaderBloc extends Cubit<LoaderState> {
       if (polylinePoints == null || polylinePoints.isEmpty) {
         log('Overview polyline points are missing or empty');
         emit(state.copyWith(
+          polylines: {},
           status: LoaderStatus.failure,
           errorMessage: 'Invalid polyline data',
         ));
@@ -51,6 +61,7 @@ class LoaderBloc extends Cubit<LoaderState> {
         log('Failed to decode polyline points');
         emit(state.copyWith(
           status: LoaderStatus.failure,
+          polylines: {},
           errorMessage: 'Polyline decoding failed',
         ));
         return;
@@ -77,16 +88,23 @@ class LoaderBloc extends Cubit<LoaderState> {
   }
 
   Future<void> getCoordinates(String destination) async {
-    emit(state.copyWith(status: LoaderStatus.loading));
+    emit(state.copyWith(
+      status: LoaderStatus.loading,
+      polylines: {},
+    ));
     final result = await sl<GoogleMapsConsumer>().getCoordinates(destination);
     result.fold((left) {
       emit(state.copyWith(
-          status: LoaderStatus.failure, errorMessage: left.message));
+          status: LoaderStatus.failure,
+          errorMessage: left.message,
+          polylines: {}));
       log('Failure');
     }, (r) async {
       if (r['results'].isEmpty) {
         emit(state.copyWith(
-            errorMessage: 'اكتب عنوانا اخر', status: LoaderStatus.failure));
+            errorMessage: 'اكتب عنوانا اخر',
+            status: LoaderStatus.failure,
+            polylines: {}));
         return;
       }
       final location = r['results'][0]['geometry']['location'];
@@ -106,6 +124,7 @@ class LoaderBloc extends Cubit<LoaderState> {
         (left) => state.copyWith(
             status: LoaderStatus.failure,
             distance: '0',
+            polylines: {},
             errorMessage: left.message),
         (right) => state.copyWith(distance: right)));
   }

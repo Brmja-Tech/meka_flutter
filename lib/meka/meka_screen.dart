@@ -10,7 +10,6 @@ import 'package:meka/features/auth/presentation/blocs/user/user_cubit.dart';
 import 'package:meka/features/auth/presentation/blocs/user/user_state.dart';
 import 'package:meka/features/chat/presentation/blocs/chat_home/chat_cubit.dart';
 import 'package:meka/features/chat/presentation/views/chat_screen.dart';
-import 'package:meka/features/loader/presentation/blocs/loader_cubit.dart';
 import 'package:meka/features/loader/presentation/views/maps_screen.dart';
 import 'package:meka/features/offers/presentation/blocs/offers/offers_bloc.dart';
 import 'package:meka/features/offers/presentation/views/offers_screen.dart';
@@ -123,7 +122,7 @@ class _MekaScreenState extends State<MekaScreen>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 5, vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.white.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: const [
                           BoxShadow(
